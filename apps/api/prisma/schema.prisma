@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  MEMBER
+}
+
+model Tenant {
+  id          String       @id @default(uuid())
+  name        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  memberships Membership[]
+}
+
+model User {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  memberships  Membership[]
+  comments     Comment[]
+}
+
+model Membership {
+  id        String   @id @default(uuid())
+  userId    String
+  tenantId  String
+  role      Role     @default(MEMBER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+  @@index([tenantId])
+}
+
+enum Severity {
+  debug
+  info
+  warn
+  error
+}
+
+model Event {
+  id          String    @id @default(uuid())
+  seq         BigInt    @default(autoincrement()) @unique
+  ts          DateTime  @default(now())
+  type        String
+  severity    Severity
+  fingerprint String
+  payload     Json
+  tenantId    String
+  incidentId  String?
+  incident    Incident? @relation(fields: [incidentId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, seq])
+  @@index([tenantId, severity])
+  @@index([tenantId, type])
+  @@index([incidentId])
+}
+
+enum IncidentStatus {
+  OPEN
+  CLOSED
+}
+
+model Incident {
+  id          String         @id @default(uuid())
+  title       String
+  description String?
+  status      IncidentStatus @default(OPEN)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  tenantId    String
+  comments    Comment[]
+  events      Event[]
+
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  body       String
+  createdAt  DateTime @default(now())
+  incidentId String
+  authorId   String
+  incident   Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([incidentId, createdAt])
+}
