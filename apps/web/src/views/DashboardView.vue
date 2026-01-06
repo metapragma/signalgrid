@@ -1,38 +1,57 @@
 <script setup lang="ts">
 import { onMounted, computed, onUnmounted, ref } from 'vue';
-import { Activity, AlertTriangle, Clock, RefreshCw, TrendingUp, BarChart3 } from 'lucide-vue-next';
+import { Activity, Clock, RefreshCw, TrendingUp, BarChart3 } from 'lucide-vue-next';
 import { useMetricsStore } from '@/stores/metrics';
+import { useEventsStore } from '@/stores/events';
+import { useTimeSeries } from '@/composables/useTimeSeries';
+import EventVolumeChart from '@/components/dashboard/EventVolumeChart.vue';
+import ErrorRateGauge from '@/components/dashboard/ErrorRateGauge.vue';
+import SystemHealthPulse from '@/components/dashboard/SystemHealthPulse.vue';
+import EventFlowVis from '@/components/dashboard/EventFlowVis.vue';
 
 const metricsStore = useMetricsStore();
+const eventsStore = useEventsStore();
+
+// Time series data for the chart
+const {
+  buckets: timeSeriesBuckets,
+  isLoading: isTimeSeriesLoading,
+  fetch: fetchTimeSeries,
+} = useTimeSeries({
+  interval: '1m',
+  duration: '1h',
+  autoRefresh: true,
+  refreshInterval: 30000,
+});
 
 const refreshInterval = ref<ReturnType<typeof setInterval> | null>(null);
 
 const metrics = computed(() => metricsStore.metrics);
-
-const errorRatePercent = computed(() => {
-  if (!metrics.value) return 0;
-  return Math.round(metrics.value.errorRate * 100 * 100) / 100;
-});
-
-const errorRateStatus = computed(() => {
-  const rate = errorRatePercent.value;
-  if (rate >= 10) return 'error';
-  if (rate >= 5) return 'warn';
-  return 'success';
-});
 
 const maxFingerprintCount = computed(() => {
   if (!metrics.value?.topFingerprints.length) return 1;
   return Math.max(...metrics.value.topFingerprints.map((f) => f.count));
 });
 
-const refresh = () => {
-  metricsStore.fetchMetrics();
+// Latest event for particle system
+const latestEvent = computed(() => {
+  const event = eventsStore.events[0];
+  if (!event) return null;
+  return {
+    ts: event.ts,
+    severity: event.severity as 'debug' | 'info' | 'warn' | 'error',
+  };
+});
+
+const refresh = async () => {
+  await Promise.all([metricsStore.fetchMetrics(), fetchTimeSeries()]);
 };
 
-onMounted(() => {
-  metricsStore.fetchMetrics();
-  // Auto-refresh every 30 seconds
+onMounted(async () => {
+  // Fetch initial data
+  await Promise.all([metricsStore.fetchMetrics(), fetchTimeSeries()]);
+
+  // Auto-refresh ops metrics every 30 seconds
   refreshInterval.value = setInterval(() => {
     metricsStore.fetchMetrics();
   }, 30000);
@@ -73,23 +92,41 @@ onUnmounted(() => {
 
       <!-- Metrics grid -->
       <div v-else-if="metrics" class="metrics-container">
-        <!-- Stats row -->
-        <div class="stats-grid">
-          <!-- Error Rate Card -->
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-info">
-                <p class="stat-label">Error Rate (1h)</p>
-                <p class="stat-value" :class="`status-${errorRateStatus}`">
-                  {{ errorRatePercent }}%
-                </p>
-              </div>
-              <div class="stat-icon" :class="`status-${errorRateStatus}`">
-                <AlertTriangle />
-              </div>
-            </div>
+        <!-- Hero section: Health + Gauge -->
+        <div class="hero-grid">
+          <!-- System Health Pulse -->
+          <div class="chart-card hero-card">
+            <h2 class="card-title">System Health</h2>
+            <SystemHealthPulse
+              :error-rate="metrics.errorRate"
+              :open-incidents="metrics.openIncidentCount"
+              :is-loading="metricsStore.isLoading"
+            />
           </div>
 
+          <!-- Error Rate Gauge -->
+          <div class="chart-card hero-card">
+            <h2 class="card-title">Error Rate (1h)</h2>
+            <ErrorRateGauge :value="metrics.errorRate" :is-loading="metricsStore.isLoading" />
+          </div>
+
+          <!-- Event Flow Visualization -->
+          <div class="chart-card hero-card flow-card">
+            <EventFlowVis :latest-event="latestEvent" />
+          </div>
+        </div>
+
+        <!-- Event Volume Chart -->
+        <div class="chart-card">
+          <h2 class="card-title">
+            <TrendingUp class="title-icon" />
+            Event Volume (Last Hour)
+          </h2>
+          <EventVolumeChart :buckets="timeSeriesBuckets" :is-loading="isTimeSeriesLoading" />
+        </div>
+
+        <!-- Stats row -->
+        <div class="stats-grid">
           <!-- p50 Latency Card -->
           <div class="stat-card">
             <div class="stat-header">
@@ -105,6 +142,21 @@ onUnmounted(() => {
             </div>
           </div>
 
+          <!-- p95 Latency Card -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-info">
+                <p class="stat-label">p95 Interval</p>
+                <p class="stat-value">
+                  {{ metrics.latencyMs.p95 }}<span class="stat-unit">ms</span>
+                </p>
+              </div>
+              <div class="stat-icon accent">
+                <TrendingUp />
+              </div>
+            </div>
+          </div>
+
           <!-- p99 Latency Card -->
           <div class="stat-card">
             <div class="stat-header">
@@ -115,49 +167,8 @@ onUnmounted(() => {
                 </p>
               </div>
               <div class="stat-icon accent">
-                <TrendingUp />
+                <Clock />
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Latency percentiles bar chart -->
-        <div class="chart-card">
-          <h2 class="card-title">
-            <Clock class="title-icon" />
-            Event Interval Percentiles
-          </h2>
-          <div class="percentile-bars">
-            <div class="percentile-row">
-              <span class="percentile-label">p50</span>
-              <div class="percentile-bar-bg">
-                <div
-                  class="percentile-bar"
-                  :style="{
-                    width: `${Math.min(100, (metrics.latencyMs.p50 / Math.max(metrics.latencyMs.p99, 1)) * 100)}%`,
-                  }"
-                ></div>
-              </div>
-              <span class="percentile-value">{{ metrics.latencyMs.p50 }}ms</span>
-            </div>
-            <div class="percentile-row">
-              <span class="percentile-label">p95</span>
-              <div class="percentile-bar-bg">
-                <div
-                  class="percentile-bar opacity-70"
-                  :style="{
-                    width: `${Math.min(100, (metrics.latencyMs.p95 / Math.max(metrics.latencyMs.p99, 1)) * 100)}%`,
-                  }"
-                ></div>
-              </div>
-              <span class="percentile-value">{{ metrics.latencyMs.p95 }}ms</span>
-            </div>
-            <div class="percentile-row">
-              <span class="percentile-label">p99</span>
-              <div class="percentile-bar-bg">
-                <div class="percentile-bar opacity-50" style="width: 100%"></div>
-              </div>
-              <span class="percentile-value">{{ metrics.latencyMs.p99 }}ms</span>
             </div>
           </div>
         </div>
@@ -217,9 +228,8 @@ onUnmounted(() => {
 .page-header {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px 16px;
-  border-bottom: 1px solid var(--color-sg-border);
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-4) var(--space-6);
 }
 
 @media (min-width: 768px) {
@@ -227,52 +237,57 @@ onUnmounted(() => {
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 32px 24px;
+    padding: var(--space-12) var(--space-8) var(--space-8);
   }
 }
 
 .header-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .page-title {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: var(--text-display);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-display);
   color: var(--color-sg-text);
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-tight);
 }
 
 @media (min-width: 768px) {
   .page-title {
-    font-size: 40px;
+    font-size: 36px;
   }
 }
 
 .page-subtitle {
-  font-size: 14px;
-  color: var(--color-sg-text-muted);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-sg-text-subtle);
 }
 
 .refresh-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background-color: transparent;
-  border: 1px solid var(--color-sg-border);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-sg-bg-elevated);
+  border: none;
   border-radius: 8px;
   color: var(--color-sg-text-muted);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-body);
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .refresh-btn:hover:not(:disabled) {
   background-color: var(--color-sg-bg-hover);
-  border-color: var(--color-sg-border-light);
   color: var(--color-sg-text);
 }
 
@@ -298,37 +313,37 @@ onUnmounted(() => {
 
 /* Content */
 .dashboard-content {
-  padding: 24px 16px;
+  padding: var(--space-6) var(--space-4);
 }
 
 @media (min-width: 768px) {
   .dashboard-content {
-    padding: 24px;
+    padding: var(--space-6);
   }
 }
 
 .error-banner {
-  margin-bottom: 24px;
-  padding: 12px 16px;
+  margin-bottom: var(--space-6);
+  padding: var(--space-4);
   background-color: var(--color-sg-error-muted);
-  border: 1px solid var(--color-sg-error);
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--color-sg-error);
-  font-size: 14px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
 }
 
 .loading-state {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 60px;
+  padding: var(--space-16);
 }
 
 .spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid var(--color-sg-border);
-  border-top-color: var(--color-sg-accent);
+  border: 2px solid var(--color-sg-bg-hover);
+  border-top-color: var(--color-sg-text-muted);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -337,15 +352,37 @@ onUnmounted(() => {
 .metrics-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  max-width: 1200px;
+  gap: var(--space-8);
+  max-width: 1400px;
+}
+
+/* Hero Grid - Health, Gauge, Flow */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.hero-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.flow-card {
+  padding: var(--space-4);
 }
 
 /* Stats Grid */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: var(--space-6);
 }
 
 @media (min-width: 768px) {
@@ -355,10 +392,9 @@ onUnmounted(() => {
 }
 
 .stat-card {
-  background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
-  border-radius: 12px;
-  padding: 20px;
+  background-color: var(--color-sg-bg-card);
+  border-radius: 16px;
+  padding: var(--space-6);
 }
 
 .stat-header {
@@ -370,169 +406,98 @@ onUnmounted(() => {
 .stat-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-2);
 }
 
 .stat-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-sg-text-muted);
+  color: var(--color-sg-text-subtle);
 }
 
 .stat-value {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: var(--text-hero);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-hero);
+  letter-spacing: var(--tracking-tight);
   color: var(--color-sg-text);
   font-variant-numeric: tabular-nums;
 }
 
-.stat-value.status-success {
-  color: var(--color-sg-open);
-}
-
-.stat-value.status-warn {
-  color: var(--color-sg-warn);
-}
-
-.stat-value.status-error {
-  color: var(--color-sg-error);
-}
-
 .stat-unit {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: var(--text-title);
+  font-weight: var(--weight-regular);
   color: var(--color-sg-text-subtle);
+  margin-left: 2px;
 }
 
 .stat-icon {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--color-sg-text-subtle);
 }
 
 .stat-icon svg {
-  width: 22px;
-  height: 22px;
-}
-
-.stat-icon.status-success {
-  background-color: rgba(63, 185, 80, 0.15);
-  color: var(--color-sg-open);
-}
-
-.stat-icon.status-warn {
-  background-color: rgba(210, 153, 34, 0.15);
-  color: var(--color-sg-warn);
-}
-
-.stat-icon.status-error {
-  background-color: rgba(248, 81, 73, 0.15);
-  color: var(--color-sg-error);
+  width: 20px;
+  height: 20px;
 }
 
 .stat-icon.accent {
-  background-color: rgba(34, 211, 238, 0.15);
-  color: var(--color-sg-accent);
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--color-sg-text-subtle);
 }
 
 /* Chart Cards */
 .chart-card {
-  background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
-  border-radius: 12px;
-  padding: 20px;
+  background-color: var(--color-sg-bg-card);
+  border-radius: 16px;
+  padding: var(--space-6);
 }
 
 .card-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 600;
+  gap: var(--space-2);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-sg-text-muted);
-  margin-bottom: 20px;
+  color: var(--color-sg-text-subtle);
+  margin-bottom: var(--space-4);
 }
 
 .title-icon {
-  width: 16px;
-  height: 16px;
-}
-
-/* Percentile Bars */
-.percentile-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.percentile-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.percentile-label {
-  width: 32px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--color-sg-text-subtle);
-}
-
-.percentile-bar-bg {
-  flex: 1;
-  height: 24px;
-  background-color: var(--color-sg-bg-card);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.percentile-bar {
-  height: 100%;
-  background-color: var(--color-sg-accent);
-  border-radius: 6px;
-  transition: width 0.3s ease;
-}
-
-.percentile-bar.opacity-70 {
-  opacity: 0.7;
-}
-
-.percentile-bar.opacity-50 {
-  opacity: 0.5;
-}
-
-.percentile-value {
-  width: 80px;
-  text-align: right;
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-sg-text);
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
 }
 
 /* Fingerprints List */
 .fingerprints-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .fingerprint-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .fingerprint-rank {
   width: 20px;
-  font-size: 12px;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
   font-variant-numeric: tabular-nums;
   color: var(--color-sg-text-subtle);
 }
@@ -545,26 +510,26 @@ onUnmounted(() => {
 .fingerprint-name {
   display: block;
   font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--color-sg-accent);
-  margin-bottom: 6px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--color-sg-text);
+  margin-bottom: var(--space-1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .fingerprint-bar-bg {
-  height: 8px;
-  background-color: var(--color-sg-bg-card);
-  border-radius: 4px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
   overflow: hidden;
 }
 
 .fingerprint-bar {
   height: 100%;
-  background-color: var(--color-sg-accent);
-  opacity: 0.6;
-  border-radius: 4px;
+  background-color: var(--color-sg-text-subtle);
+  border-radius: 2px;
   transition: width 0.3s ease;
 }
 
@@ -572,15 +537,16 @@ onUnmounted(() => {
   width: 48px;
   text-align: right;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-body);
   font-variant-numeric: tabular-nums;
   color: var(--color-sg-text-muted);
 }
 
 .empty-chart {
   text-align: center;
-  padding: 32px;
-  font-size: 14px;
+  padding: var(--space-8);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
 }
 
@@ -590,7 +556,7 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 24px;
+  padding: var(--space-16) var(--space-6);
   text-align: center;
 }
 
@@ -602,7 +568,7 @@ onUnmounted(() => {
   justify-content: center;
   background-color: var(--color-sg-bg-elevated);
   border-radius: 12px;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
   color: var(--color-sg-text-muted);
 }
 
@@ -612,14 +578,16 @@ onUnmounted(() => {
 }
 
 .empty-state h2 {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--text-title);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-title);
   color: var(--color-sg-text);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-1);
 }
 
 .empty-state p {
-  font-size: 14px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
 }
 </style>

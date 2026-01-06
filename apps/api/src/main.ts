@@ -2,10 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { WsAdapter } from '@nestjs/platform-ws';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Cookie parser for refresh tokens
+  app.use(cookieParser());
 
   // Security headers
   app.use(

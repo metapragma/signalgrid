@@ -197,7 +197,7 @@ const getShortId = (id: string) => {
               <div class="card-meta">
                 <span class="status-badge" :class="getStatusClass(incident.status)">
                   <span class="status-dot"></span>
-                  {{ incident.status === 'OPEN' ? 'OPEN' : 'RESOLVED' }}
+                  {{ incident.status === 'OPEN' ? 'Open' : 'Resolved' }}
                 </span>
                 <span class="incident-id">{{ getShortId(incident.id) }}</span>
               </div>
@@ -237,9 +237,8 @@ const getShortId = (id: string) => {
 .page-header {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px 16px;
-  border-bottom: 1px solid var(--color-sg-border);
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-4) var(--space-6);
 }
 
 @media (min-width: 768px) {
@@ -247,34 +246,36 @@ const getShortId = (id: string) => {
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 32px 24px;
+    padding: var(--space-12) var(--space-8) var(--space-8);
   }
 }
 
 .header-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .page-title {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: var(--text-display);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-display);
   color: var(--color-sg-text);
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-tight);
 }
 
 @media (min-width: 768px) {
   .page-title {
-    font-size: 40px;
+    font-size: 36px;
   }
 }
 
 .page-subtitle {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: var(--space-2);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
 }
 
@@ -282,28 +283,28 @@ const getShortId = (id: string) => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: var(--color-sg-open);
-  box-shadow: 0 0 8px var(--color-sg-open);
+  background-color: var(--color-sg-success);
+  box-shadow: 0 0 8px var(--color-sg-success);
 }
 
 .create-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background-color: transparent;
-  border: 1px solid var(--color-sg-accent);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-sg-accent);
+  border: none;
   border-radius: 8px;
-  color: var(--color-sg-accent);
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--color-sg-bg);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-body);
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .create-btn:hover {
-  background-color: var(--color-sg-accent);
-  color: var(--color-sg-bg);
+  background-color: var(--color-sg-accent-hover);
 }
 
 .create-btn .btn-icon {
@@ -315,9 +316,8 @@ const getShortId = (id: string) => {
 .filters-bar {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border-bottom: 1px solid var(--color-sg-border);
+  gap: var(--space-3);
+  padding: var(--space-4);
 }
 
 @media (min-width: 768px) {
@@ -325,39 +325,39 @@ const getShortId = (id: string) => {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 24px;
+    padding: var(--space-4) var(--space-8);
   }
 }
 
 .filter-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .filter-pill {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
+  border: none;
   border-radius: 20px;
   color: var(--color-sg-text-muted);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-body);
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .filter-pill:hover {
-  border-color: var(--color-sg-border-light);
+  background-color: var(--color-sg-bg-hover);
   color: var(--color-sg-text);
 }
 
 .filter-pill.active {
   background-color: var(--color-sg-bg-card);
-  border-color: var(--color-sg-accent);
   color: var(--color-sg-text);
 }
 
@@ -369,8 +369,7 @@ const getShortId = (id: string) => {
 .view-toggle {
   display: flex;
   background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -403,37 +402,37 @@ const getShortId = (id: string) => {
 
 /* Content */
 .incidents-content {
-  padding: 24px 16px;
+  padding: var(--space-6) var(--space-4);
 }
 
 @media (min-width: 768px) {
   .incidents-content {
-    padding: 24px;
+    padding: var(--space-6);
   }
 }
 
 .error-banner {
-  margin-bottom: 16px;
-  padding: 12px 16px;
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
   background-color: var(--color-sg-error-muted);
-  border: 1px solid var(--color-sg-error);
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--color-sg-error);
-  font-size: 14px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
 }
 
 .loading-state {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 60px;
+  padding: var(--space-16);
 }
 
 .spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid var(--color-sg-border);
-  border-top-color: var(--color-sg-accent);
+  border: 2px solid var(--color-sg-bg-hover);
+  border-top-color: var(--color-sg-text-muted);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -449,7 +448,7 @@ const getShortId = (id: string) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 24px;
+  padding: var(--space-16) var(--space-6);
   text-align: center;
 }
 
@@ -461,7 +460,7 @@ const getShortId = (id: string) => {
   justify-content: center;
   background-color: var(--color-sg-bg-elevated);
   border-radius: 12px;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
   color: var(--color-sg-text-muted);
 }
 
@@ -471,30 +470,32 @@ const getShortId = (id: string) => {
 }
 
 .empty-state h2 {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--text-title);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-title);
   color: var(--color-sg-text);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-1);
 }
 
 .empty-state p {
-  font-size: 14px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
-  margin-bottom: 20px;
+  margin-bottom: var(--space-4);
 }
 
 /* Incidents List/Grid */
 .incidents-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-4);
   max-width: 900px;
 }
 
 .incidents-container.view-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
+  gap: var(--space-4);
   max-width: none;
 }
 
@@ -502,18 +503,16 @@ const getShortId = (id: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
-  border-radius: 12px;
+  padding: var(--space-4) var(--space-6);
+  background-color: var(--color-sg-bg-card);
+  border-radius: 16px;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .incident-card:hover {
   background-color: var(--color-sg-bg-hover);
-  border-color: var(--color-sg-border-light);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Grid card variant */
@@ -528,13 +527,13 @@ const getShortId = (id: string) => {
 }
 
 .incident-card.card-grid .status-icon {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .card-left {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .status-icon {
@@ -553,8 +552,7 @@ const getShortId = (id: string) => {
 }
 
 .status-icon.status-open {
-  background-color: var(--color-sg-open);
-  background: linear-gradient(135deg, #3fb950 0%, #2ea043 100%);
+  background: linear-gradient(135deg, var(--color-sg-success) 0%, #2ea043 100%);
   color: white;
 }
 
@@ -566,27 +564,28 @@ const getShortId = (id: string) => {
 .card-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .card-meta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .status-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
+  gap: var(--space-2);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .status-badge.status-open {
-  color: var(--color-sg-open);
+  color: var(--color-sg-success);
 }
 
 .status-badge.status-resolved {
@@ -602,19 +601,21 @@ const getShortId = (id: string) => {
 
 .incident-id {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-micro);
+  line-height: var(--leading-micro);
   color: var(--color-sg-text-subtle);
 }
 
 .incident-title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-body);
   color: var(--color-sg-text);
-  line-height: 1.3;
 }
 
 .incident-details {
-  font-size: 13px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
 }
 
@@ -622,14 +623,16 @@ const getShortId = (id: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--space-2);
   width: 100%;
-  padding: 12px;
-  margin-top: 12px;
+  padding: var(--space-3);
+  margin-top: var(--space-3);
   background: none;
   border: none;
   color: var(--color-sg-text-muted);
-  font-size: 13px;
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-body);
   cursor: pointer;
   transition: color 0.15s;
 }

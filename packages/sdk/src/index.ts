@@ -9,6 +9,7 @@ import {
   LoginRequestSchema,
   RegisterRequestSchema,
   AuthResponseSchema,
+  RefreshResponseSchema,
   MeResponseSchema,
   // Event schemas
   EventsQuerySchema,
@@ -22,6 +23,8 @@ import {
   CreateCommentResponseSchema,
   // Metrics schemas
   OpsMetricsResponseSchema,
+  TimeSeriesQuerySchema,
+  TimeSeriesResponseSchema,
   // WebSocket schemas
   WsClientFrameSchema,
   WsServerFrameSchema,
@@ -29,6 +32,7 @@ import {
   type LoginRequest,
   type RegisterRequest,
   type AuthResponse,
+  type RefreshResponse,
   type MeResponse,
   type Event,
   type EventsQuery,
@@ -40,6 +44,8 @@ import {
   type CreateCommentRequest,
   type CreateCommentResponse,
   type OpsMetricsResponse,
+  type TimeSeriesQuery,
+  type TimeSeriesResponse,
   type WsClientFrame,
   type WsServerFrame,
   type WsEventFilters,
@@ -83,9 +89,14 @@ export class ValidationError extends SdkError {
 // HTTP Client (internal helper)
 // ============================================================================
 
+// Callback type for token refresh
+export type TokenRefreshCallback = () => Promise<{ token: string; expiresAt: string } | null>;
+
 class HttpClient {
   private baseUrl: string;
   private token: string | null = null;
+  private refreshCallback: TokenRefreshCallback | null = null;
+  private refreshPromise: Promise<{ token: string; expiresAt: string } | null> | null = null;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl.replace(/\/$/, ''); // Remove trailing slash
@@ -99,6 +110,10 @@ class HttpClient {
     return this.token;
   }
 
+  setRefreshCallback(callback: TokenRefreshCallback | null): void {
+    this.refreshCallback = callback;
+  }
+
   private async request<T>(
     method: string,
     path: string,
@@ -106,9 +121,10 @@ class HttpClient {
       body?: unknown;
       query?: Record<string, string | number | undefined>;
       auth?: boolean;
+      skipRetry?: boolean;
     } = {},
   ): Promise<T> {
-    const { body, query, auth = true } = options;
+    const { body, query, auth = true, skipRetry = false } = options;
 
     // Build URL with query params
     let url = `${this.baseUrl}${path}`;
@@ -133,12 +149,22 @@ class HttpClient {
       headers['Authorization'] = `Bearer ${this.token}`;
     }
 
-    // Make request
+    // Make request with credentials to include cookies
     const response = await fetch(url, {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
+      credentials: 'include', // Include cookies for refresh token
     });
+
+    // Handle 401 with automatic refresh
+    if (response.status === 401 && !skipRetry && this.refreshCallback) {
+      const refreshResult = await this.tryRefresh();
+      if (refreshResult) {
+        // Retry the original request with new token
+        return this.request<T>(method, path, { ...options, skipRetry: true });
+      }
+    }
 
     // Parse response
     const data = await response.json();
@@ -155,6 +181,28 @@ class HttpClient {
     return data as T;
   }
 
+  private async tryRefresh(): Promise<{ token: string; expiresAt: string } | null> {
+    // Prevent multiple simultaneous refresh attempts
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    if (!this.refreshCallback) {
+      return null;
+    }
+
+    this.refreshPromise = this.refreshCallback();
+    try {
+      const result = await this.refreshPromise;
+      if (result) {
+        this.token = result.token;
+      }
+      return result;
+    } finally {
+      this.refreshPromise = null;
+    }
+  }
+
   get<T>(
     path: string,
     options?: { query?: Record<string, string | number | undefined>; auth?: boolean },
@@ -164,6 +212,10 @@ class HttpClient {
 
   post<T>(path: string, body?: unknown, options?: { auth?: boolean }): Promise<T> {
     return this.request<T>('POST', path, { body, ...options });
+  }
+
+  patch<T>(path: string, body?: unknown, options?: { auth?: boolean }): Promise<T> {
+    return this.request<T>('PATCH', path, { body, ...options });
   }
 }
 
@@ -178,7 +230,7 @@ class AuthModule {
     // Validate input
     const validated = LoginRequestSchema.parse(data);
 
-    // Make request
+    // Make request (includes credentials for cookie)
     const response = await this.http.post<AuthResponse>('/auth/login', validated, { auth: false });
 
     // Validate response
@@ -194,7 +246,7 @@ class AuthModule {
     // Validate input
     const validated = RegisterRequestSchema.parse(data);
 
-    // Make request
+    // Make request (includes credentials for cookie)
     const response = await this.http.post<AuthResponse>('/auth/register', validated, {
       auth: false,
     });
@@ -208,6 +260,33 @@ class AuthModule {
     return result;
   }
 
+  /**
+   * Refresh the access token using the httpOnly refresh token cookie
+   */
+  async refresh(): Promise<RefreshResponse> {
+    const response = await this.http.post<RefreshResponse>('/auth/refresh', undefined, {
+      auth: false,
+    });
+
+    const result = RefreshResponseSchema.parse(response);
+
+    // Update stored token
+    this.http.setToken(result.token);
+
+    return result;
+  }
+
+  /**
+   * Logout and clear the refresh token cookie
+   */
+  async logout(): Promise<void> {
+    try {
+      await this.http.post<{ success: boolean }>('/auth/logout', undefined, { auth: false });
+    } finally {
+      this.http.setToken(null);
+    }
+  }
+
   async me(): Promise<MeResponse> {
     const response = await this.http.get<MeResponse>('/me');
     return MeResponseSchema.parse(response);
@@ -219,6 +298,14 @@ class AuthModule {
 
   getToken(): string | null {
     return this.http.getToken();
+  }
+
+  /**
+   * Set a callback to be called when the access token needs refreshing
+   * This enables automatic token refresh on 401 responses
+   */
+  setRefreshCallback(callback: TokenRefreshCallback | null): void {
+    this.http.setRefreshCallback(callback);
   }
 }
 
@@ -289,6 +376,17 @@ class MetricsModule {
   async getOps(): Promise<OpsMetricsResponse> {
     const response = await this.http.get<OpsMetricsResponse>('/metrics/ops');
     return OpsMetricsResponseSchema.parse(response);
+  }
+
+  async getTimeSeries(query?: Partial<TimeSeriesQuery>): Promise<TimeSeriesResponse> {
+    const validated = TimeSeriesQuerySchema.parse(query ?? {});
+    const response = await this.http.get<TimeSeriesResponse>('/metrics/timeseries', {
+      query: {
+        interval: validated.interval,
+        duration: validated.duration,
+      },
+    });
+    return TimeSeriesResponseSchema.parse(response);
   }
 }
 
@@ -473,6 +571,7 @@ export type {
   LoginRequest,
   RegisterRequest,
   AuthResponse,
+  RefreshResponse,
   MeResponse,
   Event,
   EventsQuery,
@@ -484,6 +583,8 @@ export type {
   CreateCommentRequest,
   CreateCommentResponse,
   OpsMetricsResponse,
+  TimeSeriesQuery,
+  TimeSeriesResponse,
   WsClientFrame,
   WsServerFrame,
   WsEventFilters,

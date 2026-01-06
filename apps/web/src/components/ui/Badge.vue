@@ -13,15 +13,15 @@ const props = withDefaults(
 );
 
 const classes = computed(() => {
-  const base = 'inline-flex items-center px-2 py-0.5 text-xs font-medium rounded';
+  const base = 'inline-flex items-center px-2.5 py-0.5 text-[11px] font-normal rounded-full';
 
   const variants = {
-    error: 'bg-red-500/20 text-red-400',
-    warn: 'bg-amber-500/20 text-amber-400',
-    info: 'bg-blue-500/20 text-blue-400',
-    debug: 'bg-zinc-500/20 text-zinc-400',
-    success: 'bg-emerald-500/20 text-emerald-400',
-    neutral: 'bg-zinc-500/20 text-zinc-400',
+    error: 'bg-red-500/8 text-red-400',
+    warn: 'bg-amber-500/8 text-amber-400',
+    info: 'bg-blue-500/8 text-blue-400',
+    debug: 'bg-zinc-500/8 text-zinc-400',
+    success: 'bg-emerald-500/8 text-emerald-400',
+    neutral: 'bg-zinc-500/8 text-zinc-400',
   };
 
   return [base, variants[props.variant]];

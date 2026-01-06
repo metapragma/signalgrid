@@ -167,7 +167,7 @@ const handleSubmit = async () => {
   justify-content: center;
   min-height: 100vh;
   background-color: var(--color-sg-bg);
-  padding: 24px;
+  padding: var(--space-6);
 }
 
 .auth-container {
@@ -181,74 +181,81 @@ const handleSubmit = async () => {
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 32px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
 }
 
 .logo-icon {
   width: 32px;
   height: 32px;
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text-muted);
 }
 
 .logo-text {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: var(--text-title);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-title);
   color: var(--color-sg-text);
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-tight);
 }
 
 .auth-card {
   width: 100%;
-  background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
+  background-color: var(--color-sg-bg-card);
   border-radius: 16px;
-  padding: 32px;
+  padding: var(--space-8);
+  box-shadow: var(--shadow-lg);
 }
 
 .card-header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: var(--space-6);
 }
 
 .card-header h1 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: var(--text-display);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-display);
   color: var(--color-sg-text);
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
+  letter-spacing: var(--tracking-tight);
+  margin-bottom: var(--space-2);
 }
 
 .card-header p {
-  font-size: 14px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-4);
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .form-group label {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
   color: var(--color-sg-text);
 }
 
 .form-input {
   width: 100%;
-  padding: 12px 14px;
-  background-color: var(--color-sg-bg);
-  border: 1px solid var(--color-sg-border);
+  padding: var(--space-3);
+  background-color: var(--color-sg-bg-elevated);
+  border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text);
   transition: all 0.15s;
 }
@@ -259,8 +266,7 @@ const handleSubmit = async () => {
 
 .form-input:focus {
   outline: none;
-  border-color: var(--color-sg-accent);
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .password-wrapper {
@@ -302,21 +308,22 @@ const handleSubmit = async () => {
 .password-checks {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 4px;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
 }
 
 .check-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: var(--space-2);
+  font-size: var(--text-micro);
+  line-height: var(--leading-micro);
   color: var(--color-sg-text-subtle);
   transition: color 0.15s;
 }
 
 .check-item.valid {
-  color: var(--color-sg-open);
+  color: var(--color-sg-success);
 }
 
 .check-icon {
@@ -325,30 +332,31 @@ const handleSubmit = async () => {
 }
 
 .error-message {
-  padding: 12px 14px;
-  background-color: rgba(248, 81, 73, 0.1);
-  border: 1px solid rgba(248, 81, 73, 0.3);
+  padding: var(--space-3);
+  background-color: var(--color-sg-error-muted);
   border-radius: 8px;
   color: var(--color-sg-error);
-  font-size: 13px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
 }
 
 .submit-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-2);
   width: 100%;
-  padding: 12px 20px;
+  padding: var(--space-3) var(--space-4);
   background-color: var(--color-sg-accent);
   border: none;
   border-radius: 8px;
   color: var(--color-sg-bg);
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-body);
   cursor: pointer;
   transition: all 0.15s;
-  margin-top: 4px;
+  margin-top: var(--space-1);
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -367,31 +375,32 @@ const handleSubmit = async () => {
 }
 
 .card-footer {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--color-sg-border);
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
   text-align: center;
 }
 
 .card-footer p {
-  font-size: 14px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
 }
 
 .link {
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text);
   text-decoration: none;
-  font-weight: 500;
-  transition: opacity 0.15s;
+  font-weight: var(--weight-medium);
+  transition: color 0.15s;
 }
 
 .link:hover {
-  opacity: 0.8;
+  color: var(--color-sg-text-muted);
 }
 
 .footer-text {
-  margin-top: 32px;
-  font-size: 13px;
+  margin-top: var(--space-8);
+  font-size: var(--text-micro);
+  line-height: var(--leading-micro);
   color: var(--color-sg-text-subtle);
   text-align: center;
 }

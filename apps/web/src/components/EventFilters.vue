@@ -107,23 +107,22 @@ watch(
 .event-filters {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 12px 16px;
-  background-color: #1a1a1a;
-  border-bottom: 1px solid #2a2a2a;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-sg-bg-elevated);
 }
 
 @media (min-width: 480px) {
   .event-filters {
     flex-direction: row;
-    gap: 16px;
+    gap: var(--space-4);
   }
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
   flex: 1;
 }
 
@@ -134,21 +133,23 @@ watch(
 }
 
 .filter-group label {
-  font-size: 11px;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: #666;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  color: var(--color-sg-text-muted);
 }
 
 .filter-group select,
 .filter-group input {
-  background-color: #252525;
-  border: 1px solid #333;
-  border-radius: 4px;
-  padding: 8px 10px;
-  color: #e0e0e0;
-  font-size: 14px;
+  background-color: var(--color-sg-bg-card);
+  border: none;
+  border-radius: 6px;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-sg-text);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   width: 100%;
 }
 
@@ -157,15 +158,13 @@ watch(
   .filter-group input {
     min-width: 150px;
     width: auto;
-    font-size: 13px;
-    padding: 6px 10px;
   }
 }
 
 .filter-group select:focus,
 .filter-group input:focus {
   outline: none;
-  border-color: #5eaeff;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .filter-group select {
@@ -179,22 +178,23 @@ watch(
 }
 
 .input-wrapper input {
-  padding-right: 28px;
+  padding-right: var(--space-8);
 }
 
 .clear-btn {
   position: absolute;
-  right: 6px;
+  right: var(--space-2);
   background: none;
   border: none;
-  color: #666;
+  color: var(--color-sg-text-subtle);
   cursor: pointer;
-  font-size: 16px;
-  padding: 2px 6px;
+  font-size: var(--text-body);
+  padding: 2px var(--space-2);
   line-height: 1;
+  transition: color 0.15s;
 }
 
 .clear-btn:hover {
-  color: #fff;
+  color: var(--color-sg-text);
 }
 </style>

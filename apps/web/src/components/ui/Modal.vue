@@ -26,21 +26,19 @@ const handleContentClick = (event: Event) => {
     <Transition name="modal">
       <div v-if="open" class="fixed inset-0 z-40" @click="handleBackdropClick">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 bg-black/80"></div>
 
         <!-- Modal -->
-        <div class="fixed inset-0 flex items-center justify-center z-50 p-3 sm:p-4">
+        <div class="fixed inset-0 flex items-center justify-center z-50 p-4 sm:p-6">
           <div
-            class="w-full max-w-lg bg-zinc-900/95 backdrop-blur-xl border border-zinc-700 rounded-xl shadow-2xl max-h-[90vh] overflow-y-auto"
+            class="w-full max-w-lg bg-[--color-sg-bg-card] rounded-2xl shadow-[--shadow-xl] max-h-[90vh] overflow-y-auto"
             @click="handleContentClick"
           >
             <!-- Header -->
-            <div
-              class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-zinc-800"
-            >
-              <h2 class="text-base sm:text-lg font-medium text-zinc-100">{{ title }}</h2>
+            <div class="flex items-center justify-between px-6 sm:px-8 py-5 sm:py-6">
+              <h2 class="text-lg sm:text-xl font-medium text-zinc-100">{{ title }}</h2>
               <button
-                class="text-zinc-400 hover:text-zinc-100 transition-colors p-1 rounded-lg hover:bg-zinc-800"
+                class="text-zinc-500 hover:text-zinc-300 transition-colors p-1.5 rounded-lg hover:bg-white/5"
                 @click="emit('close')"
               >
                 <X class="w-5 h-5" />
@@ -48,14 +46,14 @@ const handleContentClick = (event: Event) => {
             </div>
 
             <!-- Body -->
-            <div class="px-4 sm:px-6 py-4">
+            <div class="px-6 sm:px-8 pb-6">
               <slot />
             </div>
 
             <!-- Footer -->
             <div
               v-if="$slots.footer"
-              class="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-zinc-800 bg-zinc-950/50"
+              class="flex flex-col-reverse sm:flex-row justify-end gap-3 px-6 sm:px-8 py-5 sm:py-6 bg-black/20"
             >
               <slot name="footer" />
             </div>

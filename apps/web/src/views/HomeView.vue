@@ -65,7 +65,7 @@ const auth = useAuthStore();
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 24px;
+  padding: var(--space-6);
   background-color: var(--color-sg-bg);
 }
 
@@ -77,55 +77,57 @@ const auth = useAuthStore();
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 32px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
 }
 
 .logo-icon {
   width: 40px;
   height: 40px;
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text-muted);
 }
 
 .logo-text {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: var(--text-display);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-display);
   color: var(--color-sg-text);
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-tight);
 }
 
 .title {
   font-size: 36px;
-  font-weight: 700;
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-display);
   color: var(--color-sg-text);
-  margin-bottom: 12px;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
+  margin-bottom: var(--space-3);
+  letter-spacing: var(--tracking-tight);
 }
 
 @media (min-width: 640px) {
   .title {
-    font-size: 48px;
+    font-size: var(--text-hero);
   }
 }
 
 .subtitle {
-  font-size: 16px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
-  margin-bottom: 40px;
-  line-height: 1.6;
+  margin-bottom: var(--space-10);
 }
 
 @media (min-width: 640px) {
   .subtitle {
-    font-size: 18px;
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
   }
 }
 
 .auth-buttons {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
   width: 100%;
   max-width: 280px;
   margin: 0 auto;
@@ -143,10 +145,11 @@ const auth = useAuthStore();
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 24px;
-  font-size: 15px;
-  font-weight: 600;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-body);
   text-decoration: none;
   border-radius: 8px;
   transition: all 0.15s ease;
@@ -163,14 +166,13 @@ const auth = useAuthStore();
 }
 
 .btn-secondary {
-  background-color: var(--color-sg-bg-elevated);
+  background-color: var(--color-sg-bg-hover);
   color: var(--color-sg-text);
-  border: 1px solid var(--color-sg-border);
+  border: none;
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-sg-bg-hover);
-  border-color: var(--color-sg-border-light);
+  background-color: var(--color-sg-bg-active);
 }
 
 .btn-icon {
@@ -181,17 +183,16 @@ const auth = useAuthStore();
 .nav-cards {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
   text-align: left;
 }
 
 .nav-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background-color: var(--color-sg-bg-card);
   border-radius: 12px;
   text-decoration: none;
   transition: all 0.15s ease;
@@ -199,14 +200,14 @@ const auth = useAuthStore();
 
 .nav-card:hover {
   background-color: var(--color-sg-bg-hover);
-  border-color: var(--color-sg-border-light);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .card-icon {
   width: 24px;
   height: 24px;
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text-muted);
   flex-shrink: 0;
 }
 
@@ -215,14 +216,16 @@ const auth = useAuthStore();
 }
 
 .card-content h3 {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-body);
   color: var(--color-sg-text);
   margin-bottom: 2px;
 }
 
 .card-content p {
-  font-size: 13px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
 }
 
@@ -238,6 +241,6 @@ const auth = useAuthStore();
 
 .nav-card:hover .arrow-icon {
   transform: translateX(4px);
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text);
 }
 </style>

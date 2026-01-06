@@ -161,7 +161,7 @@ onUnmounted(() => {
             <div class="status-row">
               <span class="status-badge" :class="{ open: isOpen, closed: !isOpen }">
                 <span class="status-dot"></span>
-                {{ isOpen ? 'OPEN' : 'CLOSED' }}
+                {{ isOpen ? 'Open' : 'Closed' }}
               </span>
               <span class="incident-id">{{ shortId }}</span>
             </div>
@@ -208,7 +208,7 @@ onUnmounted(() => {
           <section class="section">
             <h2 class="section-title">
               <Info class="section-icon" />
-              DESCRIPTION
+              Description
             </h2>
             <div class="description-card">
               <p v-if="incident.description" class="description-text">
@@ -223,16 +223,16 @@ onUnmounted(() => {
             <div class="section-header">
               <h2 class="section-title">
                 <Activity class="section-icon" />
-                LINKED EVENTS ({{ incident.events.length }})
+                Linked Events ({{ incident.events.length }})
               </h2>
-              <button v-if="incident.events.length > 0" class="view-all-link">VIEW ALL LOGS</button>
+              <button v-if="incident.events.length > 0" class="view-all-link">View All Logs</button>
             </div>
 
             <div v-if="incident.events.length > 0" class="events-table">
               <div class="table-header">
-                <span class="col-timestamp">TIMESTAMP</span>
-                <span class="col-source">SOURCE</span>
-                <span class="col-message">MESSAGE</span>
+                <span class="col-timestamp">Timestamp</span>
+                <span class="col-source">Source</span>
+                <span class="col-message">Message</span>
               </div>
               <div class="table-body">
                 <div v-for="event in incident.events" :key="event.id" class="table-row">
@@ -262,7 +262,7 @@ onUnmounted(() => {
           <section class="section">
             <h2 class="section-title">
               <Clock class="section-icon" />
-              TIMELINE
+              Timeline
             </h2>
 
             <!-- Comment Input -->
@@ -313,7 +313,7 @@ onUnmounted(() => {
                 </div>
                 <div class="timeline-content">
                   <div class="timeline-header">
-                    <span class="timeline-label system">SYSTEM EVENT</span>
+                    <span class="timeline-label system">System Event</span>
                     <span class="timeline-time">{{ formatCommentTime(incident.createdAt) }}</span>
                   </div>
                   <div class="timeline-system-text">
@@ -329,7 +329,7 @@ onUnmounted(() => {
                 </div>
                 <div class="timeline-content">
                   <div class="timeline-header">
-                    <span class="timeline-label alert">ALERT TRIGGERED</span>
+                    <span class="timeline-label alert">Alert Triggered</span>
                     <span class="timeline-time">{{ formatCommentTime(incident.createdAt) }}</span>
                   </div>
                   <div class="timeline-system-text">
@@ -360,23 +360,24 @@ onUnmounted(() => {
 
 /* Back Section */
 .back-section {
-  padding: 16px 16px 0;
+  padding: var(--space-4) var(--space-4) 0;
 }
 
 @media (min-width: 768px) {
   .back-section {
-    padding: 20px 24px 0;
+    padding: var(--space-6) var(--space-6) 0;
   }
 }
 
 .back-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   background: none;
   border: none;
   color: var(--color-sg-text-muted);
-  font-size: 14px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   cursor: pointer;
   transition: color 0.15s;
 }
@@ -401,8 +402,8 @@ onUnmounted(() => {
 .spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid var(--color-sg-border);
-  border-top-color: var(--color-sg-accent);
+  border: 2px solid var(--color-sg-bg-hover);
+  border-top-color: var(--color-sg-text-muted);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -415,10 +416,9 @@ onUnmounted(() => {
 
 .error-banner {
   margin: 16px;
-  padding: 12px 16px;
+  padding: 14px 18px;
   background-color: var(--color-sg-error-muted);
-  border: 1px solid var(--color-sg-error);
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--color-sg-error);
   font-size: 14px;
 }
@@ -436,9 +436,8 @@ onUnmounted(() => {
 
 /* Incident Header */
 .incident-header {
-  padding: 20px 0 24px;
-  border-bottom: 1px solid var(--color-sg-border);
-  margin-bottom: 24px;
+  padding: 24px 0 32px;
+  margin-bottom: 32px;
 }
 
 .header-top {
@@ -469,25 +468,23 @@ onUnmounted(() => {
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
   border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
 }
 
 .status-badge.open {
-  background-color: rgba(63, 185, 80, 0.15);
-  color: var(--color-sg-open);
-  border: 1px solid rgba(63, 185, 80, 0.3);
+  background-color: rgba(52, 211, 153, 0.12);
+  color: var(--color-sg-success);
 }
 
 .status-badge.closed {
   background-color: var(--color-sg-bg-elevated);
   color: var(--color-sg-text-muted);
-  border: 1px solid var(--color-sg-border);
 }
 
 .status-dot {
@@ -504,17 +501,18 @@ onUnmounted(() => {
 }
 
 .incident-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--color-sg-accent);
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-  margin-bottom: 12px;
+  font-size: var(--text-display);
+  font-weight: var(--weight-semibold);
+  color: var(--color-sg-text);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-display);
+  margin-bottom: var(--space-3);
 }
 
 @media (min-width: 768px) {
   .incident-title {
-    font-size: 40px;
+    font-size: var(--text-hero);
+    line-height: var(--leading-hero);
   }
 }
 
@@ -539,7 +537,7 @@ onUnmounted(() => {
 }
 
 .meta-item.region {
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text);
 }
 
 .meta-separator {
@@ -565,19 +563,18 @@ onUnmounted(() => {
 }
 
 .action-btn.secondary {
-  background-color: transparent;
-  border: 1px solid var(--color-sg-border-light);
+  background-color: var(--color-sg-bg-elevated);
+  border: none;
   color: var(--color-sg-text);
 }
 
 .action-btn.secondary:hover {
   background-color: var(--color-sg-bg-hover);
-  border-color: var(--color-sg-text-muted);
 }
 
 .action-btn.primary {
   background-color: var(--color-sg-accent);
-  border: 1px solid var(--color-sg-accent);
+  border: none;
   color: var(--color-sg-bg);
 }
 
@@ -614,11 +611,12 @@ onUnmounted(() => {
 .section-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 600;
+  gap: var(--space-2);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: var(--color-sg-text-muted);
 }
 
@@ -630,25 +628,23 @@ onUnmounted(() => {
 .view-all-link {
   background: none;
   border: none;
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text-muted);
   font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: color 0.15s;
 }
 
 .view-all-link:hover {
-  opacity: 0.8;
+  color: var(--color-sg-text);
 }
 
 /* Description */
 .description-card {
-  background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
-  border-radius: 12px;
-  padding: 20px;
+  background-color: var(--color-sg-bg-card);
+  border-radius: 16px;
+  padding: 24px;
 }
 
 .description-text {
@@ -666,23 +662,22 @@ onUnmounted(() => {
 
 /* Events Table */
 .events-table {
-  background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
-  border-radius: 12px;
+  background-color: var(--color-sg-bg-card);
+  border-radius: 16px;
   overflow: hidden;
 }
 
 .table-header {
   display: grid;
   grid-template-columns: 90px 140px 1fr;
-  gap: 16px;
-  padding: 12px 16px;
-  background-color: var(--color-sg-bg-card);
-  border-bottom: 1px solid var(--color-sg-border);
-  font-size: 11px;
-  font-weight: 600;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background-color: rgba(0, 0, 0, 0.2);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: var(--color-sg-text-subtle);
 }
 
@@ -695,14 +690,9 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 90px 140px 1fr;
   gap: 16px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--color-sg-border);
+  padding: 14px 20px;
   font-size: 13px;
   transition: background-color 0.15s;
-}
-
-.table-row:last-child {
-  border-bottom: none;
 }
 
 .table-row:hover {
@@ -716,7 +706,7 @@ onUnmounted(() => {
 
 .col-source {
   font-family: var(--font-mono);
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text);
 }
 
 .col-message {
@@ -753,9 +743,8 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 40px;
-  background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
-  border-radius: 12px;
+  background-color: var(--color-sg-bg-card);
+  border-radius: 16px;
   text-align: center;
 }
 
@@ -777,10 +766,9 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
-  border-radius: 8px;
-  padding: 4px 4px 4px 16px;
-  margin-bottom: 20px;
+  border-radius: 12px;
+  padding: 6px 6px 6px 18px;
+  margin-bottom: 24px;
 }
 
 .comment-input {
@@ -866,12 +854,12 @@ onUnmounted(() => {
 }
 
 .timeline-icon.system-icon {
-  background-color: rgba(34, 211, 238, 0.15);
-  color: var(--color-sg-accent);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-sg-text-muted);
 }
 
 .timeline-icon.alert-icon {
-  background-color: rgba(248, 81, 73, 0.15);
+  background-color: rgba(251, 113, 133, 0.12);
   color: var(--color-sg-error);
 }
 
@@ -896,12 +884,11 @@ onUnmounted(() => {
 .timeline-label {
   font-size: 11px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
 }
 
 .timeline-label.system {
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text-muted);
 }
 
 .timeline-label.alert {
@@ -914,10 +901,9 @@ onUnmounted(() => {
 }
 
 .timeline-message {
-  background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
-  border-radius: 8px;
-  padding: 12px;
+  background-color: var(--color-sg-bg-card);
+  border-radius: 12px;
+  padding: 14px;
   font-size: 14px;
   color: var(--color-sg-text-muted);
   line-height: 1.5;
@@ -935,7 +921,7 @@ onUnmounted(() => {
 .timeline-system-text code {
   font-family: var(--font-mono);
   font-size: 13px;
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text);
   background-color: var(--color-sg-bg-elevated);
   padding: 2px 6px;
   border-radius: 4px;

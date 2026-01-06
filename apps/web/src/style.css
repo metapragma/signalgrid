@@ -1,58 +1,175 @@
 @import "tailwindcss";
 
 @theme {
-  /* Typography */
+  /* ============================================
+     TYPOGRAPHY - Font Families
+     ============================================ */
+  --font-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-serif: "Source Serif 4", Georgia, serif;
   --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
 
-  /* SignalGrid Brand Colors */
-  --color-sg-bg: #0d1117;
-  --color-sg-bg-elevated: #161b22;
-  --color-sg-bg-card: #1c2128;
-  --color-sg-bg-hover: #262c36;
-  --color-sg-border: #30363d;
-  --color-sg-border-light: #484f58;
+  /* ============================================
+     TYPOGRAPHY - Size Scale (5 sizes only)
+     ============================================ */
+  --text-hero: 48px;      /* Dashboard hero numbers */
+  --text-display: 28px;   /* Page titles */
+  --text-title: 18px;     /* Section headers */
+  --text-body: 15px;      /* Body text, everything else */
+  --text-micro: 11px;     /* Timestamps, labels only */
 
-  /* Text colors */
-  --color-sg-text: #e6edf3;
-  --color-sg-text-muted: #8b949e;
-  --color-sg-text-subtle: #6e7681;
+  /* ============================================
+     TYPOGRAPHY - Line Heights
+     ============================================ */
+  --leading-hero: 1;
+  --leading-display: 1.2;
+  --leading-title: 1.3;
+  --leading-body: 1.5;
+  --leading-micro: 1.4;
 
-  /* Accent */
+  /* ============================================
+     TYPOGRAPHY - Letter Spacing
+     ============================================ */
+  --tracking-tight: -0.02em;    /* Large text (24px+) */
+  --tracking-normal: 0em;       /* Body text */
+  --tracking-wide: 0.06em;      /* Small caps, labels */
+
+  /* ============================================
+     TYPOGRAPHY - Font Weights
+     ============================================ */
+  --weight-light: 300;     /* Hero numbers only */
+  --weight-regular: 400;   /* Body text */
+  --weight-medium: 500;    /* Emphasis, interactive */
+  --weight-semibold: 600;  /* Headings */
+
+  /* ============================================
+     SPACING - 8px Grid System (strict)
+     ============================================ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ============================================
+     SHADOWS - Depth System
+     ============================================ */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.45);
+
+  /* ============================================
+     COLORS - Refined Dark Palette
+     Cool undertones in depths, warmer as elevated
+     ============================================ */
+
+  /* Backgrounds - subtle blue undertone in depths */
+  --color-sg-bg: #09090b;
+  --color-sg-bg-elevated: #0f0f12;
+  --color-sg-bg-card: #141417;
+  --color-sg-bg-hover: #1a1a1e;
+  --color-sg-bg-active: #202025;
+
+  /* Surface effects */
+  --color-sg-surface-glow: rgba(255, 255, 255, 0.02);
+  --color-sg-surface-shine: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+
+  /* Borders - use sparingly */
+  --color-sg-border: #1f1f24;
+  --color-sg-border-light: #28282e;
+
+  /* Text - warmer hierarchy */
+  --color-sg-text: #ececf1;
+  --color-sg-text-secondary: #a1a1aa;
+  --color-sg-text-muted: #71717a;
+  --color-sg-text-subtle: #52525b;
+
+  /* ============================================
+     COLORS - Primary Accent (cyan)
+     Reserved for primary CTAs only
+     ============================================ */
   --color-sg-accent: #22d3ee;
   --color-sg-accent-hover: #67e8f9;
   --color-sg-accent-muted: rgba(34, 211, 238, 0.15);
+  --color-sg-accent-subtle: rgba(34, 211, 238, 0.08);
 
-  /* Severity colors */
-  --color-sg-error: #f85149;
-  --color-sg-error-muted: rgba(248, 81, 73, 0.15);
-  --color-sg-warn: #d29922;
-  --color-sg-warn-muted: rgba(210, 153, 34, 0.15);
-  --color-sg-info: #58a6ff;
-  --color-sg-info-muted: rgba(88, 166, 255, 0.15);
-  --color-sg-debug: #8b949e;
-  --color-sg-debug-muted: rgba(139, 148, 158, 0.15);
+  /* Secondary accent (violet) - for variety */
+  --color-sg-accent-alt: #a78bfa;
+  --color-sg-accent-alt-muted: rgba(167, 139, 250, 0.15);
 
-  /* Status colors */
-  --color-sg-open: #3fb950;
-  --color-sg-critical: #f85149;
-  --color-sg-investigating: #58a6ff;
-  --color-sg-resolved: #8b949e;
+  /* ============================================
+     COLORS - Semantic (refined, less saturated)
+     ============================================ */
+
+  /* Success - refined emerald */
+  --color-sg-success: #34d399;
+  --color-sg-success-muted: rgba(52, 211, 153, 0.12);
+  --color-sg-success-subtle: rgba(52, 211, 153, 0.06);
+
+  /* Error - refined rose */
+  --color-sg-error: #fb7185;
+  --color-sg-error-muted: rgba(251, 113, 133, 0.12);
+  --color-sg-error-subtle: rgba(251, 113, 133, 0.06);
+
+  /* Warning - refined amber */
+  --color-sg-warn: #fbbf24;
+  --color-sg-warn-muted: rgba(251, 191, 36, 0.12);
+  --color-sg-warn-subtle: rgba(251, 191, 36, 0.06);
+
+  /* Info - refined sky */
+  --color-sg-info: #38bdf8;
+  --color-sg-info-muted: rgba(56, 189, 248, 0.12);
+  --color-sg-info-subtle: rgba(56, 189, 248, 0.06);
+
+  /* Debug - refined slate */
+  --color-sg-debug: #94a3b8;
+  --color-sg-debug-muted: rgba(148, 163, 184, 0.08);
+
+  /* ============================================
+     COLORS - Status (semantic)
+     ============================================ */
+  --color-sg-open: #34d399;
+  --color-sg-critical: #fb7185;
+  --color-sg-investigating: #38bdf8;
+  --color-sg-resolved: #71717a;
+
+  /* ============================================
+     COLORS - Data Visualization Palette
+     Harmonious 6-color set
+     ============================================ */
+  --color-chart-1: #22d3ee;   /* Cyan */
+  --color-chart-2: #a78bfa;   /* Violet */
+  --color-chart-3: #34d399;   /* Emerald */
+  --color-chart-4: #fbbf24;   /* Amber */
+  --color-chart-5: #fb7185;   /* Rose */
+  --color-chart-6: #38bdf8;   /* Sky */
 }
 
-/* Base styles */
+/* ============================================
+   BASE STYLES
+   ============================================ */
 html {
   color-scheme: dark;
 }
 
 body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  font-weight: var(--weight-regular);
   background-color: var(--color-sg-bg);
   color: var(--color-sg-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar styling */
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -71,36 +188,77 @@ body {
   background-color: var(--color-sg-border-light);
 }
 
-/* Focus visible for keyboard navigation */
+/* ============================================
+   FOCUS STYLES - Subtle, neutral
+   ============================================ */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-sg-bg), 0 0 0 4px var(--color-sg-accent-muted);
+  box-shadow: 0 0 0 2px var(--color-sg-bg), 0 0 0 4px rgba(255, 255, 255, 0.1);
 }
 
-/* Remove default button styles */
 button {
   outline: none;
 }
 
-/* Consistent form field focus styles */
 input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--color-sg-accent) !important;
-  box-shadow: 0 0 0 3px var(--color-sg-accent-muted) !important;
+  border-color: var(--color-sg-border-light) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05) !important;
 }
 
-/* Select dropdown arrow styling */
+/* ============================================
+   SELECT DROPDOWN
+   ============================================ */
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   padding-right: 36px;
 }
 
-/* Tabular numbers for data */
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+/* Text hierarchy utilities */
+.text-hero {
+  font-size: var(--text-hero);
+  line-height: var(--leading-hero);
+  font-weight: var(--weight-light);
+  letter-spacing: var(--tracking-tight);
+}
+
+.text-display {
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+}
+
+.text-title {
+  font-size: var(--text-title);
+  line-height: var(--leading-title);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+}
+
+.text-body {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-normal);
+}
+
+.text-micro {
+  font-size: var(--text-micro);
+  line-height: var(--leading-micro);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
 }

@@ -133,7 +133,7 @@ const handleBackdropClick = (event: MouseEvent) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: var(--space-4);
   background-color: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
   z-index: 100;
@@ -142,10 +142,9 @@ const handleBackdropClick = (event: MouseEvent) => {
 .modal-container {
   width: 100%;
   max-width: 480px;
-  background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
+  background-color: var(--color-sg-bg-card);
   border-radius: 16px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-xl);
   overflow: hidden;
 }
 
@@ -169,8 +168,8 @@ const handleBackdropClick = (event: MouseEvent) => {
 .modal-header {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  padding: 24px 24px 0;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-6) 0;
 }
 
 .header-icon {
@@ -179,7 +178,7 @@ const handleBackdropClick = (event: MouseEvent) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(248, 81, 73, 0.15);
+  background-color: rgba(251, 113, 133, 0.12);
   border-radius: 10px;
   color: var(--color-sg-error);
   flex-shrink: 0;
@@ -195,14 +194,16 @@ const handleBackdropClick = (event: MouseEvent) => {
 }
 
 .modal-title {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: var(--text-title);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-title);
   color: var(--color-sg-text);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-1);
 }
 
 .modal-subtitle {
-  font-size: 13px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
 }
 
@@ -210,8 +211,8 @@ const handleBackdropClick = (event: MouseEvent) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: var(--space-8);
+  height: var(--space-8);
   background: none;
   border: none;
   border-radius: 6px;
@@ -232,11 +233,11 @@ const handleBackdropClick = (event: MouseEvent) => {
 
 /* Body */
 .modal-body {
-  padding: 24px;
+  padding: var(--space-6);
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: var(--space-4);
 }
 
 .form-group:last-child {
@@ -245,25 +246,31 @@ const handleBackdropClick = (event: MouseEvent) => {
 
 .form-label {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
   color: var(--color-sg-text);
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .optional {
-  font-weight: 400;
+  font-weight: var(--weight-regular);
+  text-transform: none;
+  letter-spacing: var(--tracking-normal);
   color: var(--color-sg-text-subtle);
 }
 
 .form-input,
 .form-textarea {
   width: 100%;
-  padding: 12px 14px;
-  background-color: var(--color-sg-bg);
-  border: 1px solid var(--color-sg-border);
+  padding: var(--space-3);
+  background-color: var(--color-sg-bg-elevated);
+  border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text);
   transition: all 0.15s;
   font-family: inherit;
@@ -277,8 +284,7 @@ const handleBackdropClick = (event: MouseEvent) => {
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: var(--color-sg-accent);
-  box-shadow: 0 0 0 3px var(--color-sg-accent-muted);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .form-input:disabled,
@@ -296,19 +302,20 @@ const handleBackdropClick = (event: MouseEvent) => {
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 24px 24px;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6) var(--space-6);
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
   border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-body);
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -319,20 +326,19 @@ const handleBackdropClick = (event: MouseEvent) => {
 }
 
 .btn-secondary {
-  background-color: transparent;
-  border: 1px solid var(--color-sg-border);
+  background-color: var(--color-sg-bg-hover);
+  border: none;
   color: var(--color-sg-text-muted);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--color-sg-bg-hover);
-  border-color: var(--color-sg-border-light);
+  background-color: var(--color-sg-bg-active);
   color: var(--color-sg-text);
 }
 
 .btn-primary {
   background-color: var(--color-sg-accent);
-  border: 1px solid var(--color-sg-accent);
+  border: none;
   color: var(--color-sg-bg);
 }
 

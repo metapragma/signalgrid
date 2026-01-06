@@ -17,6 +17,7 @@ export interface OpsMetrics {
   latencyMs: LatencyPercentiles;
   errorRate: number;
   topFingerprints: FingerprintCount[];
+  openIncidentCount: number;
 }
 
 export const useMetricsStore = defineStore('metrics', () => {

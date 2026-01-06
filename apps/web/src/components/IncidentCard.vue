@@ -68,7 +68,7 @@ const shortId = computed(() => {
         </span>
       </div>
       <span
-        class="inline-flex items-center gap-1 text-xs text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity"
+        class="inline-flex items-center gap-1 text-xs text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity"
       >
         View
         <ChevronRight class="w-3.5 h-3.5" />

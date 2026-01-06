@@ -20,15 +20,13 @@ const props = withDefaults(
 
 const classes = computed(() => {
   const base =
-    'inline-flex items-center justify-center gap-2 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-950 disabled:opacity-50 disabled:cursor-not-allowed transition-colors';
+    'inline-flex items-center justify-center gap-2 font-medium tracking-wide rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all';
 
   const variants = {
-    primary: 'text-zinc-950 bg-cyan-400 hover:bg-cyan-300 focus:ring-cyan-400/50',
-    secondary:
-      'text-zinc-100 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 focus:ring-cyan-400/50',
-    ghost: 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 focus:ring-cyan-400/50',
-    danger:
-      'text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 focus:ring-red-400/50',
+    primary: 'text-zinc-950 bg-cyan-400 hover:bg-cyan-300',
+    secondary: 'text-zinc-300 bg-[--color-sg-bg-hover] hover:bg-zinc-700 hover:text-zinc-100',
+    ghost: 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5',
+    danger: 'text-red-400 bg-red-500/10 hover:bg-red-500/20',
   };
 
   const sizes = {

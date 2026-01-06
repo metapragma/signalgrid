@@ -33,7 +33,7 @@ const payloadPreview = computed(() => {
 <template>
   <div class="event-row" :class="severityClass">
     <span class="event-time">{{ formattedTime }}</span>
-    <span class="event-severity">{{ event.severity }}</span>
+    <span class="event-severity">{{ event.severity.charAt(0).toUpperCase() + event.severity.slice(1) }}</span>
     <span class="event-type">{{ event.type }}</span>
     <span class="event-payload">{{ payloadPreview }}</span>
   </div>
@@ -43,46 +43,48 @@ const payloadPreview = computed(() => {
 .event-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px 12px;
-  border-bottom: 1px solid #2a2a2a;
-  font-family: 'SF Mono', 'Consolas', monospace;
-  font-size: 13px;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   align-items: center;
   transition: background-color 0.15s ease;
+  border-left: 2px solid transparent;
 }
 
 @media (min-width: 640px) {
   .event-row {
     display: grid;
     grid-template-columns: 80px 60px minmax(120px, 200px) 1fr;
-    gap: 12px;
+    gap: var(--space-3);
     flex-wrap: nowrap;
   }
 }
 
 .event-row:hover {
-  background-color: #1a1a2e;
+  background-color: var(--color-sg-bg-hover);
 }
 
 .event-time {
-  color: #888;
+  color: var(--color-sg-text-muted);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
 
 .event-severity {
-  text-transform: uppercase;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 6px;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
+  padding: 2px var(--space-2);
   border-radius: 3px;
   text-align: center;
   flex-shrink: 0;
 }
 
 .event-type {
-  color: #7eb8da;
+  color: var(--color-sg-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -91,7 +93,7 @@ const payloadPreview = computed(() => {
 }
 
 .event-payload {
-  color: #666;
+  color: var(--color-sg-text-subtle);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -108,31 +110,33 @@ const payloadPreview = computed(() => {
 
 /* Severity colors */
 .severity-debug .event-severity {
-  background-color: #2d2d44;
-  color: #8888aa;
+  background-color: var(--color-sg-debug-muted);
+  color: var(--color-sg-text-subtle);
 }
 
 .severity-info .event-severity {
-  background-color: #1e3a5f;
-  color: #5eaeff;
+  background-color: var(--color-sg-info-muted);
+  color: var(--color-sg-info);
 }
 
 .severity-warn .event-severity {
-  background-color: #4a3f00;
-  color: #ffc107;
+  background-color: var(--color-sg-warn-muted);
+  color: var(--color-sg-warn);
 }
 
 .severity-error .event-severity {
-  background-color: #4a1515;
-  color: #ff5252;
+  background-color: var(--color-sg-error-muted);
+  color: var(--color-sg-error);
 }
 
 /* Row highlight based on severity */
 .severity-error {
-  background-color: rgba(255, 82, 82, 0.05);
+  background-color: var(--color-sg-error-subtle);
+  border-left-color: var(--color-sg-error);
 }
 
 .severity-warn {
-  background-color: rgba(255, 193, 7, 0.03);
+  background-color: var(--color-sg-warn-subtle);
+  border-left-color: var(--color-sg-warn);
 }
 </style>

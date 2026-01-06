@@ -71,11 +71,20 @@ export const RegisterRequestSchema = z.object({
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 
 // POST /auth/login, POST /auth/register - response
+// Note: refreshToken is returned in httpOnly cookie, not in response body
 export const AuthResponseSchema = z.object({
   user: UserSchema,
   token: z.string(),
+  expiresAt: IsoDateSchema, // When the access token expires
 });
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+
+// POST /auth/refresh - response (refresh token comes from httpOnly cookie)
+export const RefreshResponseSchema = z.object({
+  token: z.string(),
+  expiresAt: IsoDateSchema,
+});
+export type RefreshResponse = z.infer<typeof RefreshResponseSchema>;
 
 // GET /me - response
 export const MeResponseSchema = z.object({
@@ -228,8 +237,40 @@ export const OpsMetricsResponseSchema = z.object({
   latencyMs: LatencyPercentilesSchema,
   errorRate: z.number(),
   topFingerprints: z.array(FingerprintCountSchema),
+  openIncidentCount: z.number().int(),
 });
 export type OpsMetricsResponse = z.infer<typeof OpsMetricsResponseSchema>;
+
+// GET /metrics/timeseries - query parameters
+export const TimeSeriesIntervalSchema = z.enum(['1m', '5m', '15m']);
+export type TimeSeriesInterval = z.infer<typeof TimeSeriesIntervalSchema>;
+
+export const TimeSeriesDurationSchema = z.enum(['15m', '1h', '6h', '24h']);
+export type TimeSeriesDuration = z.infer<typeof TimeSeriesDurationSchema>;
+
+export const TimeSeriesQuerySchema = z.object({
+  interval: TimeSeriesIntervalSchema.default('1m'),
+  duration: TimeSeriesDurationSchema.default('1h'),
+});
+export type TimeSeriesQuery = z.infer<typeof TimeSeriesQuerySchema>;
+
+// GET /metrics/timeseries - response
+export const TimeSeriesBucketSchema = z.object({
+  ts: IsoDateSchema,
+  total: z.number().int(),
+  error: z.number().int(),
+  warn: z.number().int(),
+  info: z.number().int(),
+  debug: z.number().int(),
+});
+export type TimeSeriesBucket = z.infer<typeof TimeSeriesBucketSchema>;
+
+export const TimeSeriesResponseSchema = z.object({
+  buckets: z.array(TimeSeriesBucketSchema),
+  interval: TimeSeriesIntervalSchema,
+  duration: TimeSeriesDurationSchema,
+});
+export type TimeSeriesResponse = z.infer<typeof TimeSeriesResponseSchema>;
 
 // ============================================================================
 // WebSocket Types - Client → Server Frames

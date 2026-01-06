@@ -57,6 +57,9 @@ router.beforeEach(async (to, _from, next) => {
   const { useAuthStore } = await import('@/stores/auth');
   const auth = useAuthStore();
 
+  // Wait for auth initialization to complete before checking
+  await auth.waitForInit();
+
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     // Redirect to login if trying to access protected route
     next({ name: 'login', query: { redirect: to.fullPath } });

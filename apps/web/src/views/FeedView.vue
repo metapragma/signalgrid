@@ -30,13 +30,13 @@ const statusClass = computed(() => {
 const statusText = computed(() => {
   switch (eventsStore.connectionStatus) {
     case 'connected':
-      return 'CONNECTED';
+      return 'Connected';
     case 'connecting':
-      return 'CONNECTING...';
+      return 'Connecting...';
     case 'error':
-      return 'ERROR';
+      return 'Error';
     default:
-      return 'DISCONNECTED';
+      return 'Disconnected';
   }
 });
 
@@ -202,7 +202,7 @@ onUnmounted(() => {
       <div class="connection-info">
         <div class="status-pill" :class="statusClass">
           <span class="status-dot"></span>
-          <span class="status-label">STATUS: {{ statusText }}</span>
+          <span class="status-label">Status: {{ statusText }}</span>
         </div>
         <button class="reconnect-btn" @click="reconnect">
           <RefreshCw class="btn-icon" />
@@ -215,20 +215,20 @@ onUnmounted(() => {
     <div class="filters-bar">
       <div class="filters-left">
         <div class="filter-group">
-          <label>SEVERITY</label>
+          <label>Severity</label>
           <select v-model="localSeverity" @change="applyFilters">
-            <option :value="null">ALL</option>
-            <option value="error">ERROR</option>
-            <option value="warn">WARN</option>
-            <option value="info">INFO</option>
-            <option value="debug">DEBUG</option>
+            <option :value="null">All</option>
+            <option value="error">Error</option>
+            <option value="warn">Warn</option>
+            <option value="info">Info</option>
+            <option value="debug">Debug</option>
           </select>
         </div>
 
         <div class="filter-group">
-          <label>TYPE</label>
+          <label>Type</label>
           <select v-model="localType" @change="applyFilters">
-            <option value="">ALL TYPES</option>
+            <option value="">All Types</option>
           </select>
         </div>
 
@@ -245,11 +245,11 @@ onUnmounted(() => {
       <div class="filters-right">
         <button class="filter-btn" @click="clearFilters">
           <X class="btn-icon" />
-          CLEAR FILTERS
+          Clear Filters
         </button>
         <button class="filter-btn">
           <Download class="btn-icon" />
-          EXPORT
+          Export
         </button>
       </div>
     </div>
@@ -265,10 +265,10 @@ onUnmounted(() => {
 
       <!-- Table Header -->
       <div class="table-header">
-        <span class="col-timestamp">TIMESTAMP</span>
-        <span class="col-severity">SEVERITY</span>
-        <span class="col-type">SOURCE TYPE</span>
-        <span class="col-payload">PAYLOAD DATA</span>
+        <span class="col-timestamp">Timestamp</span>
+        <span class="col-severity">Severity</span>
+        <span class="col-type">Source Type</span>
+        <span class="col-payload">Payload Data</span>
       </div>
 
       <!-- Table Body -->
@@ -282,10 +282,10 @@ onUnmounted(() => {
           <span class="col-timestamp">{{ formatTimestamp(event.ts) }}</span>
           <span class="col-severity">
             <span class="severity-badge" :class="getSeverityClass(event.severity)">
-              {{ event.severity.toUpperCase() }}
+              {{ event.severity.charAt(0).toUpperCase() + event.severity.slice(1) }}
             </span>
           </span>
-          <span class="col-type">{{ event.type.toUpperCase() }}</span>
+          <span class="col-type">{{ event.type }}</span>
           <span class="col-payload">{{ JSON.stringify(event.payload) }}</span>
         </div>
 
@@ -306,9 +306,9 @@ onUnmounted(() => {
     <!-- Footer -->
     <footer class="page-footer">
       <span class="footer-left"
-        >VIEW: LIVE STREAM • BUFFER: {{ eventsStore.events.length }} LINES</span
+        >View: Live Stream • Buffer: {{ eventsStore.events.length }} lines</span
       >
-      <span class="footer-right">SERVER TIME: UTC {{ formattedServerTime }}</span>
+      <span class="footer-right">Server Time: UTC {{ formattedServerTime }}</span>
     </footer>
   </div>
 </template>
@@ -325,9 +325,8 @@ onUnmounted(() => {
 .page-header {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border-bottom: 1px solid var(--color-sg-border);
+  gap: var(--space-3);
+  padding: var(--space-4);
 }
 
 @media (min-width: 768px) {
@@ -335,45 +334,46 @@ onUnmounted(() => {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 24px;
+    padding: var(--space-6) var(--space-8);
   }
 }
 
 .page-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .title-icon {
   width: 20px;
   height: 20px;
-  color: var(--color-sg-accent);
+  color: var(--color-sg-text-muted);
 }
 
 .page-title h1 {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: var(--text-title);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-title);
   color: var(--color-sg-text);
 }
 
 .connection-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .status-pill {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
   background-color: var(--color-sg-bg-elevated);
-  border: 1px solid var(--color-sg-border);
   border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
 }
 
 .status-dot {
@@ -384,8 +384,8 @@ onUnmounted(() => {
 }
 
 .status-connected .status-dot {
-  background-color: var(--color-sg-open);
-  box-shadow: 0 0 8px var(--color-sg-open);
+  background-color: var(--color-sg-success);
+  box-shadow: 0 0 8px var(--color-sg-success);
 }
 
 .status-connecting .status-dot {
@@ -414,21 +414,22 @@ onUnmounted(() => {
 .reconnect-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background-color: transparent;
-  border: 1px solid var(--color-sg-accent);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-sg-bg-hover);
+  border: none;
   border-radius: 6px;
-  color: var(--color-sg-accent);
-  font-size: 13px;
-  font-weight: 600;
+  color: var(--color-sg-text-muted);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-body);
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .reconnect-btn:hover {
-  background-color: var(--color-sg-accent);
-  color: var(--color-sg-bg);
+  background-color: var(--color-sg-bg-card);
+  color: var(--color-sg-text);
 }
 
 .reconnect-btn .btn-icon {
@@ -440,10 +441,9 @@ onUnmounted(() => {
 .filters-bar {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 12px 16px;
-  background-color: var(--color-sg-bg-elevated);
-  border-bottom: 1px solid var(--color-sg-border);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--color-sg-bg);
 }
 
 @media (min-width: 1024px) {
@@ -451,42 +451,43 @@ onUnmounted(() => {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 24px;
+    padding: var(--space-4) var(--space-8);
   }
 }
 
 .filters-left {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--space-3);
   align-items: flex-end;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .filter-group label {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
   color: var(--color-sg-text-muted);
-  letter-spacing: 0.05em;
 }
 
 .filter-group select,
 .filter-group input {
-  padding: 8px 12px;
-  background-color: var(--color-sg-bg-card);
-  border: 1px solid var(--color-sg-border);
-  border-radius: 6px;
+  padding: var(--space-3) var(--space-3);
+  background-color: var(--color-sg-bg-elevated);
+  border: none;
+  border-radius: 8px;
   color: var(--color-sg-text);
-  font-size: 13px;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   min-width: 120px;
 }
-
-/* Focus styles inherited from global style.css */
 
 .search-group {
   flex: 1;
@@ -499,26 +500,29 @@ onUnmounted(() => {
 
 .filters-right {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .filter-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: none;
-  border: 1px solid var(--color-sg-border);
-  border-radius: 6px;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-sg-bg-elevated);
+  border: none;
+  border-radius: 8px;
   color: var(--color-sg-text-muted);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .filter-btn:hover {
-  border-color: var(--color-sg-border-light);
+  background-color: var(--color-sg-bg-hover);
   color: var(--color-sg-text);
 }
 
@@ -538,20 +542,21 @@ onUnmounted(() => {
 
 .new-events-btn {
   position: absolute;
-  top: 50px;
+  top: var(--space-12);
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
   background-color: var(--color-sg-accent);
   border: none;
   border-radius: 20px;
   color: var(--color-sg-bg);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-body);
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
   transition:
@@ -572,21 +577,24 @@ onUnmounted(() => {
 .table-header {
   display: grid;
   grid-template-columns: 120px 90px 180px 1fr;
-  gap: 16px;
-  padding: 10px 16px;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
   background-color: var(--color-sg-bg);
-  border-bottom: 1px solid var(--color-sg-border);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-sg-text-muted);
-  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-sm);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-sg-text-subtle);
   position: sticky;
   top: 0;
+  z-index: 5;
 }
 
 @media (min-width: 768px) {
   .table-header {
-    padding: 10px 24px;
+    padding: var(--space-3) var(--space-8);
   }
 }
 
@@ -599,17 +607,18 @@ onUnmounted(() => {
 .event-row {
   display: grid;
   grid-template-columns: 120px 90px 180px 1fr;
-  gap: 16px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--color-sg-border);
-  font-size: 13px;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   transition: background-color 0.15s;
   min-width: 600px;
+  border-left: 2px solid transparent;
 }
 
 @media (min-width: 768px) {
   .event-row {
-    padding: 10px 24px;
+    padding: var(--space-3) var(--space-8);
   }
 }
 
@@ -618,11 +627,13 @@ onUnmounted(() => {
 }
 
 .event-row.severity-error {
-  background-color: var(--color-sg-error-muted);
+  border-left-color: var(--color-sg-error);
+  background-color: var(--color-sg-error-subtle);
 }
 
 .event-row.severity-warn {
-  background-color: var(--color-sg-warn-muted);
+  border-left-color: var(--color-sg-warn);
+  background-color: var(--color-sg-warn-subtle);
 }
 
 .col-timestamp {
@@ -640,11 +651,12 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 3px 8px;
-  font-size: 11px;
-  font-weight: 700;
+  padding: 3px var(--space-2);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-micro);
   border-radius: 4px;
-  letter-spacing: 0.02em;
+  letter-spacing: var(--tracking-wide);
 }
 
 .severity-badge.severity-error {
@@ -658,21 +670,19 @@ onUnmounted(() => {
 }
 
 .severity-badge.severity-info {
-  background-color: var(--color-sg-bg-card);
-  color: var(--color-sg-text-muted);
-  border: 1px solid var(--color-sg-border);
+  background-color: var(--color-sg-info-muted);
+  color: var(--color-sg-info);
 }
 
 .severity-badge.severity-debug {
-  background-color: var(--color-sg-bg-card);
+  background-color: var(--color-sg-debug-muted);
   color: var(--color-sg-text-subtle);
-  border: 1px solid var(--color-sg-border);
 }
 
 .col-type {
   font-family: var(--font-mono);
   color: var(--color-sg-text);
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 
 .col-payload {
@@ -685,14 +695,16 @@ onUnmounted(() => {
 
 .loading-row,
 .empty-state {
-  padding: 40px;
+  padding: var(--space-10);
   text-align: center;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
 }
 
 .empty-hint {
-  margin-top: 8px;
-  font-size: 13px;
+  margin-top: var(--space-2);
+  font-size: var(--text-body);
   color: var(--color-sg-text-subtle);
 }
 
@@ -700,18 +712,18 @@ onUnmounted(() => {
 .page-footer {
   display: flex;
   justify-content: space-between;
-  padding: 10px 16px;
+  padding: var(--space-3) var(--space-4);
   background-color: var(--color-sg-bg);
-  border-top: 1px solid var(--color-sg-border);
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-micro);
+  letter-spacing: var(--tracking-wide);
   color: var(--color-sg-text-subtle);
-  letter-spacing: 0.02em;
 }
 
 @media (min-width: 768px) {
   .page-footer {
-    padding: 10px 24px;
+    padding: var(--space-3) var(--space-8);
   }
 }
 

@@ -103,7 +103,7 @@ export const useIncidentsStore = defineStore('incidents', () => {
       // Direct fetch since SDK might not have update method
       const token = authStore.token;
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/incidents/${id}`,
+        `${import.meta.env.VITE_API_URL || '/api'}/incidents/${id}`,
         {
           method: 'PATCH',
           headers: {
