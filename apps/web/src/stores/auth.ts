@@ -150,13 +150,13 @@ export const useAuthStore = defineStore('auth', () => {
   };
 
   const performLogout = async () => {
+    // Clear local state immediately so guards and UI react before network call.
+    clearTokenData();
     try {
       // Call server to clear httpOnly cookie
       await client.auth.logout();
     } catch {
       // Ignore errors during logout
-    } finally {
-      clearTokenData();
     }
   };
 

@@ -62,10 +62,10 @@ const toggleNotifications = () => {
   showUserMenu.value = false;
 };
 
-const handleLogout = () => {
+const handleLogout = async () => {
   showUserMenu.value = false;
-  auth.logout();
-  router.push('/login');
+  await auth.logout();
+  router.replace('/login');
 };
 
 const markAsRead = (id: string) => {

@@ -16,6 +16,7 @@ export default defineConfig({
         target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
+        cookieDomainRewrite: 'localhost',
       },
       '/ws': {
         target: 'ws://localhost:3000',
