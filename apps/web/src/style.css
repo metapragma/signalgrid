@@ -4,18 +4,18 @@
   /* ============================================
      TYPOGRAPHY - Font Families
      ============================================ */
-  --font-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-serif: "Source Serif 4", Georgia, serif;
-  --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+  --font-sans: "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Segoe UI", -apple-system, sans-serif;
+  --font-serif: "New York Large", "Iowan Old Style", "Source Serif 4", Georgia, serif;
+  --font-mono: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
   /* ============================================
      TYPOGRAPHY - Size Scale (5 sizes only)
      ============================================ */
-  --text-hero: 48px;      /* Dashboard hero numbers */
-  --text-display: 28px;   /* Page titles */
+  --text-hero: 52px;      /* Dashboard hero numbers */
+  --text-display: 30px;   /* Page titles */
   --text-title: 18px;     /* Section headers */
   --text-body: 15px;      /* Body text, everything else */
-  --text-micro: 11px;     /* Timestamps, labels only */
+  --text-micro: 12px;     /* Timestamps, labels only */
 
   /* ============================================
      TYPOGRAPHY - Line Heights
@@ -31,7 +31,7 @@
      ============================================ */
   --tracking-tight: -0.02em;    /* Large text (24px+) */
   --tracking-normal: 0em;       /* Body text */
-  --tracking-wide: 0.06em;      /* Small caps, labels */
+  --tracking-wide: 0.02em;      /* Small labels */
 
   /* ============================================
      TYPOGRAPHY - Font Weights
@@ -57,103 +57,102 @@
   /* ============================================
      SHADOWS - Depth System
      ============================================ */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 10px 24px rgba(15, 23, 42, 0.12);
+  --shadow-lg: 0 18px 40px rgba(15, 23, 42, 0.16);
+  --shadow-xl: 0 26px 60px rgba(15, 23, 42, 0.18);
 
   /* ============================================
-     COLORS - Refined Dark Palette
-     Cool undertones in depths, warmer as elevated
+     COLORS - Glacial Tide Palette (neutral base)
      ============================================ */
 
-  /* Backgrounds - subtle blue undertone in depths */
-  --color-sg-bg: #09090b;
-  --color-sg-bg-elevated: #0f0f12;
-  --color-sg-bg-card: #141417;
-  --color-sg-bg-hover: #1a1a1e;
-  --color-sg-bg-active: #202025;
+  /* Backgrounds */
+  --color-sg-bg: #f4f3ef;
+  --color-sg-bg-elevated: #fbfaf7;
+  --color-sg-bg-card: rgba(251, 250, 247, 0.96);
+  --color-sg-bg-hover: #fdfcf9;
+  --color-sg-bg-active: #ece9e3;
 
   /* Surface effects */
-  --color-sg-surface-glow: rgba(255, 255, 255, 0.02);
-  --color-sg-surface-shine: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+  --color-sg-surface-glow: rgba(28, 32, 30, 0.06);
+  --color-sg-surface-shine: rgba(255, 255, 255, 0.55);
 
   /* Borders - use sparingly */
-  --color-sg-border: #1f1f24;
-  --color-sg-border-light: #28282e;
+  --color-sg-border: rgba(28, 32, 30, 0.16);
+  --color-sg-border-light: rgba(28, 32, 30, 0.28);
 
   /* Text - warmer hierarchy */
-  --color-sg-text: #ececf1;
-  --color-sg-text-secondary: #a1a1aa;
-  --color-sg-text-muted: #71717a;
-  --color-sg-text-subtle: #52525b;
+  --color-sg-text: #101b18;
+  --color-sg-text-secondary: #23312c;
+  --color-sg-text-muted: #46534f;
+  --color-sg-text-subtle: #7b8782;
 
   /* ============================================
-     COLORS - Primary Accent (cyan)
-     Reserved for primary CTAs only
+     COLORS - Primary Accent (electric teal)
      ============================================ */
-  --color-sg-accent: #22d3ee;
-  --color-sg-accent-hover: #67e8f9;
-  --color-sg-accent-muted: rgba(34, 211, 238, 0.15);
-  --color-sg-accent-subtle: rgba(34, 211, 238, 0.08);
+  --color-sg-accent: #00cbb3;
+  --color-sg-accent-hover: #00dfc3;
+  --color-sg-accent-muted: rgba(0, 203, 179, 0.2);
+  --color-sg-accent-subtle: rgba(0, 203, 179, 0.1);
+  --color-sg-accent-gradient: var(--color-sg-accent);
 
-  /* Secondary accent (violet) - for variety */
-  --color-sg-accent-alt: #a78bfa;
-  --color-sg-accent-alt-muted: rgba(167, 139, 250, 0.15);
+  /* Secondary accent (laser cyan) */
+  --color-sg-accent-alt: #00e0ff;
+  --color-sg-accent-alt-muted: rgba(0, 224, 255, 0.2);
 
   /* ============================================
      COLORS - Semantic (refined, less saturated)
      ============================================ */
 
-  /* Success - refined emerald */
-  --color-sg-success: #34d399;
-  --color-sg-success-muted: rgba(52, 211, 153, 0.12);
-  --color-sg-success-subtle: rgba(52, 211, 153, 0.06);
+  /* Success - neon mint */
+  --color-sg-success: #2ee6a6;
+  --color-sg-success-muted: rgba(46, 230, 166, 0.2);
+  --color-sg-success-subtle: rgba(46, 230, 166, 0.1);
 
-  /* Error - refined rose */
-  --color-sg-error: #fb7185;
-  --color-sg-error-muted: rgba(251, 113, 133, 0.12);
-  --color-sg-error-subtle: rgba(251, 113, 133, 0.06);
+  /* Error - signal red */
+  --color-sg-error: #ff3b30;
+  --color-sg-error-muted: rgba(255, 59, 48, 0.18);
+  --color-sg-error-subtle: rgba(255, 59, 48, 0.08);
 
-  /* Warning - refined amber */
-  --color-sg-warn: #fbbf24;
-  --color-sg-warn-muted: rgba(251, 191, 36, 0.12);
-  --color-sg-warn-subtle: rgba(251, 191, 36, 0.06);
+  /* Warning - amber */
+  --color-sg-warn: #f0a343;
+  --color-sg-warn-muted: rgba(240, 163, 67, 0.2);
+  --color-sg-warn-subtle: rgba(240, 163, 67, 0.1);
 
-  /* Info - refined sky */
-  --color-sg-info: #38bdf8;
-  --color-sg-info-muted: rgba(56, 189, 248, 0.12);
-  --color-sg-info-subtle: rgba(56, 189, 248, 0.06);
+  /* Info - arctic cyan */
+  --color-sg-info: #00c7ff;
+  --color-sg-info-muted: rgba(0, 199, 255, 0.18);
+  --color-sg-info-subtle: rgba(0, 199, 255, 0.08);
 
-  /* Debug - refined slate */
-  --color-sg-debug: #94a3b8;
-  --color-sg-debug-muted: rgba(148, 163, 184, 0.08);
+  /* Debug - sage */
+  --color-sg-debug: #7b9b8f;
+  --color-sg-debug-muted: rgba(123, 155, 143, 0.14);
 
   /* ============================================
      COLORS - Status (semantic)
      ============================================ */
-  --color-sg-open: #34d399;
-  --color-sg-critical: #fb7185;
-  --color-sg-investigating: #38bdf8;
-  --color-sg-resolved: #71717a;
+  --color-sg-open: #2ee6a6;
+  --color-sg-critical: #ff3b30;
+  --color-sg-investigating: #00c7ff;
+  --color-sg-resolved: #7b9b8f;
 
   /* ============================================
      COLORS - Data Visualization Palette
      Harmonious 6-color set
      ============================================ */
-  --color-chart-1: #22d3ee;   /* Cyan */
-  --color-chart-2: #a78bfa;   /* Violet */
-  --color-chart-3: #34d399;   /* Emerald */
-  --color-chart-4: #fbbf24;   /* Amber */
-  --color-chart-5: #fb7185;   /* Rose */
-  --color-chart-6: #38bdf8;   /* Sky */
+  --color-chart-1: #00cbb3;   /* Electric teal */
+  --color-chart-2: #00e0ff;   /* Laser cyan */
+  --color-chart-3: #3dff8a;   /* Neon green */
+  --color-chart-4: #f0a343;   /* Amber */
+  --color-chart-5: #ff3b30;   /* Signal red */
+  --color-chart-6: #1e5f5a;   /* Deep teal */
 }
 
 /* ============================================
    BASE STYLES
    ============================================ */
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -161,10 +160,28 @@ body {
   font-size: var(--text-body);
   line-height: var(--leading-body);
   font-weight: var(--weight-regular);
+  position: relative;
   background-color: var(--color-sg-bg);
   color: var(--color-sg-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 0;
+}
+
+#app {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 /* ============================================
@@ -176,16 +193,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background-color: var(--color-sg-bg-elevated);
+  background-color: rgba(28, 32, 30, 0.08);
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--color-sg-border);
+  background-color: rgba(28, 32, 30, 0.32);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-sg-border-light);
+  background-color: rgba(28, 32, 30, 0.48);
 }
 
 /* ============================================
@@ -193,7 +210,7 @@ body {
    ============================================ */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-sg-bg), 0 0 0 4px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(0, 203, 179, 0.25);
 }
 
 button {
@@ -204,8 +221,8 @@ input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--color-sg-border-light) !important;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(0, 203, 179, 0.45) !important;
+  box-shadow: 0 0 0 4px rgba(0, 203, 179, 0.18) !important;
 }
 
 /* ============================================
@@ -213,7 +230,7 @@ textarea:focus {
    ============================================ */
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237b8782' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   padding-right: 36px;
@@ -224,6 +241,30 @@ select {
    ============================================ */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+/* Subtle entry motion */
+.enter-rise {
+  animation: rise-in 0.6s ease both;
+}
+
+.enter-rise.delay-1 {
+  animation-delay: 0.1s;
+}
+
+.enter-rise.delay-2 {
+  animation-delay: 0.2s;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Text hierarchy utilities */
@@ -260,5 +301,4 @@ select {
   line-height: var(--leading-micro);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
 }

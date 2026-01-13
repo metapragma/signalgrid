@@ -26,19 +26,19 @@ const handleContentClick = (event: Event) => {
     <Transition name="modal">
       <div v-if="open" class="fixed inset-0 z-40" @click="handleBackdropClick">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/80"></div>
+        <div class="absolute inset-0 bg-slate-900/20 backdrop-blur-sm"></div>
 
         <!-- Modal -->
         <div class="fixed inset-0 flex items-center justify-center z-50 p-4 sm:p-6">
           <div
-            class="w-full max-w-lg bg-[--color-sg-bg-card] rounded-2xl shadow-[--shadow-xl] max-h-[90vh] overflow-y-auto"
+            class="w-full max-w-lg bg-[--color-sg-bg-card] border border-[--color-sg-border] rounded-2xl shadow-[--shadow-xl] backdrop-blur-2xl max-h-[90vh] overflow-y-auto"
             @click="handleContentClick"
           >
             <!-- Header -->
             <div class="flex items-center justify-between px-6 sm:px-8 py-5 sm:py-6">
-              <h2 class="text-lg sm:text-xl font-medium text-zinc-100">{{ title }}</h2>
+              <h2 class="text-lg sm:text-xl font-medium text-[--color-sg-text]">{{ title }}</h2>
               <button
-                class="text-zinc-500 hover:text-zinc-300 transition-colors p-1.5 rounded-lg hover:bg-white/5"
+                class="text-[--color-sg-text-subtle] hover:text-[--color-sg-text] transition-colors p-1.5 rounded-full hover:bg-white/60"
                 @click="emit('close')"
               >
                 <X class="w-5 h-5" />
@@ -53,7 +53,7 @@ const handleContentClick = (event: Event) => {
             <!-- Footer -->
             <div
               v-if="$slots.footer"
-              class="flex flex-col-reverse sm:flex-row justify-end gap-3 px-6 sm:px-8 py-5 sm:py-6 bg-black/20"
+              class="flex flex-col-reverse sm:flex-row justify-end gap-3 px-6 sm:px-8 py-5 sm:py-6 bg-white"
             >
               <slot name="footer" />
             </div>

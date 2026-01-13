@@ -67,19 +67,21 @@ onUnmounted(() => {
 <template>
   <div class="dashboard-view">
     <!-- Page Header -->
-    <header class="page-header">
+    <header class="page-header enter-rise">
       <div class="header-content">
         <h1 class="page-title">Dashboard</h1>
-        <p class="page-subtitle">Real-time metrics and analytics</p>
+        <p class="page-subtitle">Operational signals for the last hour</p>
       </div>
-      <button class="refresh-btn" :disabled="metricsStore.isLoading" @click="refresh">
-        <RefreshCw class="btn-icon" :class="{ spinning: metricsStore.isLoading }" />
-        Refresh
-      </button>
+      <div class="header-actions">
+        <button class="refresh-btn" :disabled="metricsStore.isLoading" @click="refresh">
+          <RefreshCw class="btn-icon" :class="{ spinning: metricsStore.isLoading }" />
+          Refresh
+        </button>
+      </div>
     </header>
 
     <!-- Content -->
-    <div class="dashboard-content">
+    <div class="dashboard-content enter-rise delay-1">
       <!-- Error -->
       <div v-if="metricsStore.error" class="error-banner">
         {{ metricsStore.error }}
@@ -92,93 +94,110 @@ onUnmounted(() => {
 
       <!-- Metrics grid -->
       <div v-else-if="metrics" class="metrics-container">
-        <!-- Hero section: Health + Gauge -->
-        <div class="hero-grid">
-          <!-- System Health Pulse -->
-          <div class="chart-card hero-card">
-            <h2 class="card-title">System Health</h2>
+        <section class="overview-card">
+          <div class="overview-left">
+            <p class="eyebrow">Overview</p>
+            <h2 class="overview-title">Live operational health</h2>
+            <p class="overview-subtitle">The last hour of streaming signals, summarized.</p>
+            <div class="overview-stats">
+              <div class="stat-pill">
+                <span class="stat-pill-label">Open incidents</span>
+                <strong class="stat-pill-value">{{ metrics.openIncidentCount }}</strong>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-pill-label">Error rate</span>
+                <strong class="stat-pill-value">{{ (metrics.errorRate * 100).toFixed(2) }}%</strong>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-pill-label">p50 interval</span>
+                <strong class="stat-pill-value">{{ metrics.latencyMs.p50 }}ms</strong>
+              </div>
+            </div>
+          </div>
+          <div class="overview-right">
             <SystemHealthPulse
               :error-rate="metrics.errorRate"
               :open-incidents="metrics.openIncidentCount"
               :is-loading="metricsStore.isLoading"
             />
           </div>
+        </section>
 
-          <!-- Error Rate Gauge -->
-          <div class="chart-card hero-card">
-            <h2 class="card-title">Error Rate (1h)</h2>
-            <ErrorRateGauge :value="metrics.errorRate" :is-loading="metricsStore.isLoading" />
-          </div>
-
-          <!-- Event Flow Visualization -->
-          <div class="chart-card hero-card flow-card">
-            <EventFlowVis :latest-event="latestEvent" />
-          </div>
-        </div>
-
-        <!-- Event Volume Chart -->
-        <div class="chart-card">
-          <h2 class="card-title">
-            <TrendingUp class="title-icon" />
-            Event Volume (Last Hour)
-          </h2>
-          <EventVolumeChart :buckets="timeSeriesBuckets" :is-loading="isTimeSeriesLoading" />
-        </div>
-
-        <!-- Stats row -->
-        <div class="stats-grid">
-          <!-- p50 Latency Card -->
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-info">
-                <p class="stat-label">p50 Interval</p>
-                <p class="stat-value">
-                  {{ metrics.latencyMs.p50 }}<span class="stat-unit">ms</span>
-                </p>
+        <section class="main-grid">
+          <div class="main-left">
+            <div class="chart-card wide">
+              <div class="card-header-row">
+                <div>
+                  <h3 class="card-title">Event volume</h3>
+                  <p class="card-subtitle">Trends across severity levels</p>
+                </div>
+                <span class="card-chip">Last 60 minutes</span>
               </div>
-              <div class="stat-icon accent">
-                <Clock />
+              <EventVolumeChart :buckets="timeSeriesBuckets" :is-loading="isTimeSeriesLoading" />
+            </div>
+
+            <div class="stat-grid">
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div class="stat-info">
+                    <p class="stat-label">p95 interval</p>
+                    <p class="stat-value">
+                      {{ metrics.latencyMs.p95 }}<span class="stat-unit">ms</span>
+                    </p>
+                  </div>
+                  <div class="stat-icon accent">
+                    <TrendingUp />
+                  </div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div class="stat-info">
+                    <p class="stat-label">p99 interval</p>
+                    <p class="stat-value">
+                      {{ metrics.latencyMs.p99 }}<span class="stat-unit">ms</span>
+                    </p>
+                  </div>
+                  <div class="stat-icon accent">
+                    <Clock />
+                  </div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div class="stat-info">
+                    <p class="stat-label">Active signals</p>
+                    <p class="stat-value">
+                      {{ metrics.topFingerprints.length }}<span class="stat-unit">types</span>
+                    </p>
+                  </div>
+                  <div class="stat-icon accent">
+                    <Activity />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- p95 Latency Card -->
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-info">
-                <p class="stat-label">p95 Interval</p>
-                <p class="stat-value">
-                  {{ metrics.latencyMs.p95 }}<span class="stat-unit">ms</span>
-                </p>
-              </div>
-              <div class="stat-icon accent">
-                <TrendingUp />
-              </div>
+          <div class="main-right">
+            <div class="panel-card">
+              <h3 class="panel-title">Error rate</h3>
+              <ErrorRateGauge :value="metrics.errorRate" :is-loading="metricsStore.isLoading" />
+            </div>
+            <div class="panel-card">
+              <h3 class="panel-title">Event flow</h3>
+              <EventFlowVis :latest-event="latestEvent" />
             </div>
           </div>
+        </section>
 
-          <!-- p99 Latency Card -->
-          <div class="stat-card">
-            <div class="stat-header">
-              <div class="stat-info">
-                <p class="stat-label">p99 Interval</p>
-                <p class="stat-value">
-                  {{ metrics.latencyMs.p99 }}<span class="stat-unit">ms</span>
-                </p>
-              </div>
-              <div class="stat-icon accent">
-                <Clock />
-              </div>
+        <section class="chart-card fingerprints-card">
+          <div class="card-header-row">
+            <div>
+              <h3 class="card-title">Top fingerprints</h3>
+              <p class="card-subtitle">Highest volume sources in the last hour</p>
             </div>
           </div>
-        </div>
-
-        <!-- Top fingerprints -->
-        <div class="chart-card">
-          <h2 class="card-title">
-            <Activity class="title-icon" />
-            Top Event Fingerprints (1h)
-          </h2>
 
           <div v-if="metrics.topFingerprints.length === 0" class="empty-chart">
             No events in the last hour
@@ -203,7 +222,7 @@ onUnmounted(() => {
               <span class="fingerprint-count">{{ fp.count }}</span>
             </div>
           </div>
-        </div>
+        </section>
       </div>
 
       <!-- Empty state -->
@@ -220,8 +239,8 @@ onUnmounted(() => {
 
 <style scoped>
 .dashboard-view {
-  min-height: calc(100vh - 56px);
-  background-color: var(--color-sg-bg);
+  min-height: calc(100vh - 64px);
+  background-color: transparent;
 }
 
 /* Page Header */
@@ -262,33 +281,37 @@ onUnmounted(() => {
 }
 
 .page-subtitle {
-  font-size: var(--text-micro);
-  font-weight: var(--weight-medium);
-  line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-sg-text-subtle);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--color-sg-text-muted);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .refresh-btn {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--color-sg-bg-elevated);
+  padding: 8px 14px;
+  background-color: var(--color-sg-accent);
   border: none;
-  border-radius: 8px;
-  color: var(--color-sg-text-muted);
+  border-radius: 999px;
+  color: white;
   font-size: var(--text-body);
   font-weight: var(--weight-medium);
   line-height: var(--leading-body);
   cursor: pointer;
   transition: all 0.15s;
+  box-shadow: var(--shadow-sm);
 }
 
 .refresh-btn:hover:not(:disabled) {
-  background-color: var(--color-sg-bg-hover);
-  color: var(--color-sg-text);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .refresh-btn:disabled {
@@ -326,7 +349,8 @@ onUnmounted(() => {
   margin-bottom: var(--space-6);
   padding: var(--space-4);
   background-color: var(--color-sg-error-muted);
-  border-radius: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 69, 58, 0.2);
   color: var(--color-sg-error);
   font-size: var(--text-body);
   line-height: var(--leading-body);
@@ -342,8 +366,8 @@ onUnmounted(() => {
 .spinner {
   width: 32px;
   height: 32px;
-  border: 2px solid var(--color-sg-bg-hover);
-  border-top-color: var(--color-sg-text-muted);
+  border: 2px solid rgba(15, 23, 42, 0.12);
+  border-top-color: var(--color-sg-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -354,47 +378,151 @@ onUnmounted(() => {
   flex-direction: column;
   gap: var(--space-8);
   max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-/* Hero Grid - Health, Gauge, Flow */
-.hero-grid {
+/* Overview */
+.overview-card {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-6);
+  padding: var(--space-8);
+  background-color: var(--color-sg-bg-card);
+  border-radius: 24px;
+  border: 1px solid var(--color-sg-border);
+  box-shadow: var(--shadow-lg);
 }
 
-@media (min-width: 768px) {
-  .hero-grid {
-    grid-template-columns: 1fr 1fr 1fr;
+@media (min-width: 1024px) {
+  .overview-card {
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
   }
 }
 
-.hero-card {
+.overview-left {
   display: flex;
   flex-direction: column;
+  gap: var(--space-3);
 }
 
-.flow-card {
-  padding: var(--space-4);
+.eyebrow {
+  font-size: var(--text-micro);
+  color: var(--color-sg-text-subtle);
+}
+
+.overview-title {
+  font-size: 28px;
+  font-weight: var(--weight-semibold);
+  color: var(--color-sg-text);
+}
+
+.overview-subtitle {
+  font-size: var(--text-body);
+  color: var(--color-sg-text-muted);
+}
+
+.overview-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.stat-pill {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--color-sg-border);
+  min-width: 140px;
+}
+
+.stat-pill-label {
+  font-size: var(--text-micro);
+  color: var(--color-sg-text-subtle);
+}
+
+.stat-pill-value {
+  font-size: var(--text-title);
+  color: var(--color-sg-text);
+}
+
+.overview-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Stats Grid */
-.stats-grid {
+/* Main Grid */
+.main-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-6);
 }
 
+@media (min-width: 1024px) {
+  .main-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.main-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.main-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.card-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.card-subtitle {
+  font-size: var(--text-body);
+  color: var(--color-sg-text-muted);
+}
+
+.card-chip {
+  font-size: var(--text-micro);
+  color: var(--color-sg-text-subtle);
+  border: 1px solid var(--color-sg-border);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
 @media (min-width: 768px) {
-  .stats-grid {
+  .stat-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 .stat-card {
   background-color: var(--color-sg-bg-card);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: var(--space-6);
+  border: 1px solid var(--color-sg-border);
+  backdrop-filter: blur(16px);
 }
 
 .stat-header {
@@ -413,14 +541,12 @@ onUnmounted(() => {
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-sg-text-subtle);
+  color: var(--color-sg-text-muted);
 }
 
 .stat-value {
-  font-size: var(--text-hero);
-  font-weight: var(--weight-light);
+  font-size: 36px;
+  font-weight: var(--weight-semibold);
   line-height: var(--leading-hero);
   letter-spacing: var(--tracking-tight);
   color: var(--color-sg-text);
@@ -440,9 +566,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.03);
-  color: var(--color-sg-text-subtle);
+  border-radius: 12px;
+  background-color: var(--color-sg-accent-subtle);
+  color: var(--color-sg-accent);
 }
 
 .stat-icon svg {
@@ -451,34 +577,53 @@ onUnmounted(() => {
 }
 
 .stat-icon.accent {
-  background-color: rgba(255, 255, 255, 0.03);
-  color: var(--color-sg-text-subtle);
+  background-color: var(--color-sg-accent-subtle);
+  color: var(--color-sg-accent);
 }
 
 /* Chart Cards */
 .chart-card {
   background-color: var(--color-sg-bg-card);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: var(--space-6);
+  border: 1px solid var(--color-sg-border);
+  backdrop-filter: blur(16px);
+}
+
+.chart-card.wide {
+  min-height: 360px;
 }
 
 .card-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-micro);
-  font-weight: var(--weight-medium);
-  line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-sg-text-subtle);
-  margin-bottom: var(--space-4);
+  font-size: var(--text-title);
+  font-weight: var(--weight-semibold);
+  color: var(--color-sg-text);
+  margin-bottom: var(--space-1);
 }
 
 .title-icon {
   width: 14px;
   height: 14px;
   opacity: 0.6;
+}
+
+.panel-card {
+  background-color: var(--color-sg-bg-card);
+  border-radius: 18px;
+  padding: var(--space-6);
+  border: 1px solid var(--color-sg-border);
+  backdrop-filter: blur(16px);
+}
+
+.fingerprints-card {
+  padding-top: var(--space-6);
+}
+
+.panel-title {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--color-sg-text-secondary);
+  margin-bottom: var(--space-4);
 }
 
 /* Fingerprints List */
@@ -521,14 +666,14 @@ onUnmounted(() => {
 
 .fingerprint-bar-bg {
   height: 4px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(15, 23, 42, 0.08);
   border-radius: 2px;
   overflow: hidden;
 }
 
 .fingerprint-bar {
   height: 100%;
-  background-color: var(--color-sg-text-subtle);
+  background-color: var(--color-sg-accent);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -566,8 +711,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-sg-bg-elevated);
-  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 14px;
+  border: 1px solid var(--color-sg-border);
   margin-bottom: var(--space-4);
   color: var(--color-sg-text-muted);
 }

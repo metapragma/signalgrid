@@ -40,24 +40,24 @@ const shortId = computed(() => {
       <div class="flex items-center gap-2">
         <StatusDot :status="isOpen ? 'open' : 'closed'" />
         <span
-          class="text-xs font-medium uppercase tracking-wide"
-          :class="isOpen ? 'text-emerald-400' : 'text-zinc-500'"
+          class="text-xs font-medium"
+          :class="isOpen ? 'text-[--color-sg-success]' : 'text-[--color-sg-text-muted]'"
         >
           {{ incident.status }}
         </span>
-        <span class="font-mono text-xs text-zinc-500">{{ shortId }}</span>
+        <span class="font-mono text-xs text-[--color-sg-text-subtle]">{{ shortId }}</span>
       </div>
-      <span class="text-xs text-zinc-500">{{ timeAgo }}</span>
+      <span class="text-xs text-[--color-sg-text-subtle]">{{ timeAgo }}</span>
     </div>
 
     <!-- Title -->
-    <h3 class="text-sm font-medium text-zinc-100 mb-3 line-clamp-2">
+    <h3 class="text-sm font-medium text-[--color-sg-text] mb-3 line-clamp-2">
       {{ incident.title }}
     </h3>
 
     <!-- Footer row -->
     <div class="flex items-center justify-between">
-      <div class="flex items-center gap-4 text-xs text-zinc-500">
+      <div class="flex items-center gap-4 text-xs text-[--color-sg-text-muted]">
         <span class="inline-flex items-center gap-1">
           <Activity class="w-3.5 h-3.5" />
           {{ incident.eventCount }} events
@@ -68,7 +68,7 @@ const shortId = computed(() => {
         </span>
       </div>
       <span
-        class="inline-flex items-center gap-1 text-xs text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity"
+        class="inline-flex items-center gap-1 text-xs text-[--color-sg-text-subtle] opacity-0 group-hover:opacity-100 transition-opacity"
       >
         View
         <ChevronRight class="w-3.5 h-3.5" />

@@ -28,71 +28,81 @@ const handleSubmit = async () => {
     <div class="auth-container">
       <!-- Logo -->
       <div class="logo">
-        <LayoutGrid class="logo-icon" />
+        <LayoutGrid class="logo-icon" :stroke-width="1" />
         <span class="logo-text">SignalGrid</span>
       </div>
 
-      <!-- Auth Card -->
-      <div class="auth-card">
-        <div class="card-header">
-          <h1>Welcome back</h1>
-          <p>Sign in to your account to continue</p>
-        </div>
-
-        <form @submit.prevent="handleSubmit" class="auth-form">
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input
-              id="email"
-              v-model="email"
-              type="email"
-              placeholder="you@example.com"
-              required
-              autocomplete="email"
-              class="form-input"
-            />
+      <div class="auth-shell">
+        <!-- Auth Card -->
+        <div class="auth-card enter-rise">
+          <div class="card-header">
+            <h1>Welcome back</h1>
+            <p>Sign in to your account to continue</p>
           </div>
 
-          <div class="form-group">
-            <label for="password">Password</label>
-            <div class="password-wrapper">
+          <form @submit.prevent="handleSubmit" class="auth-form">
+            <div class="form-group">
+              <label for="email">Email</label>
               <input
-                id="password"
-                v-model="password"
-                :type="showPassword ? 'text' : 'password'"
-                placeholder="Enter your password"
+                id="email"
+                v-model="email"
+                type="email"
+                placeholder="you@example.com"
                 required
-                autocomplete="current-password"
+                autocomplete="email"
                 class="form-input"
               />
-              <button
-                type="button"
-                class="password-toggle"
-                @click="showPassword = !showPassword"
-                :title="showPassword ? 'Hide password' : 'Show password'"
-              >
-                <EyeOff v-if="showPassword" class="toggle-icon" />
-                <Eye v-else class="toggle-icon" />
-              </button>
             </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <div class="password-wrapper">
+                <input
+                  id="password"
+                  v-model="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  placeholder="Enter your password"
+                  required
+                  autocomplete="current-password"
+                  class="form-input"
+                />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  @click="showPassword = !showPassword"
+                  :title="showPassword ? 'Hide password' : 'Show password'"
+                >
+                  <EyeOff v-if="showPassword" class="toggle-icon" />
+                  <Eye v-else class="toggle-icon" />
+                </button>
+              </div>
+            </div>
+
+            <div v-if="errorMessage" class="error-message">
+              {{ errorMessage }}
+            </div>
+
+            <button type="submit" :disabled="auth.loading" class="submit-btn">
+              <span>{{ auth.loading ? 'Signing in...' : 'Sign In' }}</span>
+              <ArrowRight v-if="!auth.loading" class="btn-icon" />
+            </button>
+          </form>
+
+          <div class="card-footer">
+            <p>
+              Don't have an account?
+              <router-link to="/register" class="link">Create one</router-link>
+            </p>
           </div>
-
-          <div v-if="errorMessage" class="error-message">
-            {{ errorMessage }}
-          </div>
-
-          <button type="submit" :disabled="auth.loading" class="submit-btn">
-            <span>{{ auth.loading ? 'Signing in...' : 'Sign In' }}</span>
-            <ArrowRight v-if="!auth.loading" class="btn-icon" />
-          </button>
-        </form>
-
-        <div class="card-footer">
-          <p>
-            Don't have an account?
-            <router-link to="/register" class="link">Create one</router-link>
-          </p>
         </div>
+
+        <aside class="auth-aside enter-rise delay-1" aria-hidden="true">
+          <div class="aside-content">
+            <h2>Stay ahead of every signal.</h2>
+            <p>Real-time visibility, fewer surprises, faster response.</p>
+          </div>
+          <div class="aside-orb"></div>
+        </aside>
       </div>
 
       <!-- Footer Text -->
@@ -107,13 +117,13 @@ const handleSubmit = async () => {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: var(--color-sg-bg);
+  background-color: transparent;
   padding: var(--space-6);
 }
 
 .auth-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 880px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -143,8 +153,9 @@ const handleSubmit = async () => {
 .auth-card {
   width: 100%;
   background-color: var(--color-sg-bg-card);
-  border-radius: 16px;
+  border-radius: 22px;
   padding: var(--space-8);
+  border: 1px solid var(--color-sg-border);
   box-shadow: var(--shadow-lg);
 }
 
@@ -154,7 +165,7 @@ const handleSubmit = async () => {
 }
 
 .card-header h1 {
-  font-size: var(--text-display);
+  font-size: 28px;
   font-weight: var(--weight-semibold);
   line-height: var(--leading-display);
   color: var(--color-sg-text);
@@ -184,17 +195,15 @@ const handleSubmit = async () => {
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-sg-text);
+  color: var(--color-sg-text-secondary);
 }
 
 .form-input {
   width: 100%;
-  padding: var(--space-3);
+  padding: 10px 14px;
   background-color: var(--color-sg-bg-elevated);
-  border: none;
-  border-radius: 8px;
+  border: 1px solid var(--color-sg-border);
+  border-radius: 14px;
   font-size: var(--text-body);
   line-height: var(--leading-body);
   color: var(--color-sg-text);
@@ -207,7 +216,6 @@ const handleSubmit = async () => {
 
 .form-input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .password-wrapper {
@@ -232,7 +240,7 @@ const handleSubmit = async () => {
   border: none;
   color: var(--color-sg-text-muted);
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 12px;
   transition: all 0.15s;
 }
 
@@ -249,7 +257,7 @@ const handleSubmit = async () => {
 .error-message {
   padding: var(--space-3);
   background-color: var(--color-sg-error-muted);
-  border-radius: 8px;
+  border-radius: 14px;
   color: var(--color-sg-error);
   font-size: var(--text-body);
   line-height: var(--leading-body);
@@ -261,11 +269,11 @@ const handleSubmit = async () => {
   justify-content: center;
   gap: var(--space-2);
   width: 100%;
-  padding: var(--space-3) var(--space-4);
+  padding: 10px 16px;
   background-color: var(--color-sg-accent);
   border: none;
-  border-radius: 8px;
-  color: var(--color-sg-bg);
+  border-radius: 999px;
+  color: white;
   font-size: var(--text-body);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-body);
@@ -275,8 +283,8 @@ const handleSubmit = async () => {
 }
 
 .submit-btn:hover:not(:disabled) {
-  background-color: var(--color-sg-accent-hover);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .submit-btn:disabled {
@@ -302,14 +310,14 @@ const handleSubmit = async () => {
 }
 
 .link {
-  color: var(--color-sg-text);
+  color: var(--color-sg-accent);
   text-decoration: none;
   font-weight: var(--weight-medium);
   transition: color 0.15s;
 }
 
 .link:hover {
-  color: var(--color-sg-text-muted);
+  color: var(--color-sg-accent-hover);
 }
 
 .footer-text {
@@ -318,5 +326,66 @@ const handleSubmit = async () => {
   line-height: var(--leading-micro);
   color: var(--color-sg-text-subtle);
   text-align: center;
+}
+
+.auth-shell {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 900px) {
+  .auth-shell {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+}
+
+.auth-aside {
+  display: none;
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  background-color: var(--color-sg-bg-elevated);
+  border: 1px solid var(--color-sg-border);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-8);
+}
+
+.auth-aside::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  .auth-aside {
+    display: flex;
+    align-items: flex-end;
+  }
+}
+
+.aside-content h2 {
+  font-size: 24px;
+  color: var(--color-sg-text);
+  margin-bottom: var(--space-2);
+}
+
+.aside-content p {
+  color: var(--color-sg-text-muted);
+}
+
+.aside-orb {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background-color: rgba(0, 203, 179, 0.2);
 }
 </style>

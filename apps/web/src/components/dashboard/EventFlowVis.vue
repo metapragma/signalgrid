@@ -17,12 +17,12 @@ let particles: Particle[] = [];
 
 const MAX_PARTICLES = 50;
 
-// Design system colors - refined palette
+// Design system colors - glacial tide palette
 const colors = {
-  error: { r: 251, g: 113, b: 133 }, // rose-400
-  warn: { r: 251, g: 191, b: 36 }, // amber-400
-  info: { r: 56, g: 189, b: 248 }, // sky-400
-  debug: { r: 148, g: 163, b: 184 }, // slate-400
+  error: { r: 255, g: 59, b: 48 },
+  warn: { r: 240, g: 163, b: 67 },
+  info: { r: 0, g: 199, b: 255 },
+  debug: { r: 123, g: 155, b: 143 },
 };
 
 interface Particle {
@@ -91,7 +91,7 @@ const drawParticles = () => {
     // Draw glow
     ctx!.save();
     ctx!.globalAlpha = p.opacity * 0.3;
-    ctx!.shadowBlur = 20;
+    ctx!.shadowBlur = 14;
     ctx!.shadowColor = `rgb(${r}, ${g}, ${b})`;
     ctx!.fillStyle = `rgb(${r}, ${g}, ${b})`;
     ctx!.beginPath();
@@ -186,7 +186,7 @@ onUnmounted(() => {
   <div class="flow-container">
     <canvas ref="canvasRef" class="flow-canvas"></canvas>
     <div class="flow-label">
-      <span class="label-text">EVENT FLOW</span>
+      <span class="label-text">Event flow</span>
       <span class="particle-count">{{ particles.length }} active</span>
     </div>
   </div>
@@ -197,14 +197,10 @@ onUnmounted(() => {
   position: relative;
   width: 100%;
   height: 100px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.02) 0%,
-    transparent 20%,
-    transparent 80%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
-  border-radius: 12px;
+  background-color: var(--color-sg-bg-elevated);
+  border-radius: 16px;
+  border: 1px solid var(--color-sg-border);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
@@ -226,8 +222,7 @@ onUnmounted(() => {
   font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  color: var(--color-sg-text-subtle);
+  color: var(--color-sg-text-secondary);
 }
 
 .particle-count {

@@ -21,6 +21,7 @@ export const useEventsStore = defineStore('events', () => {
   const cursor = ref<string | null>(null);
   const hasMore = ref(true);
   const isLoadingHistory = ref(false);
+  const isDemoMode = ref(false);
 
   // Track cleanup functions
   let unsubscribeMessage: (() => void) | null = null;
@@ -28,10 +29,81 @@ export const useEventsStore = defineStore('events', () => {
   let unsubscribeClose: (() => void) | null = null;
   let pingInterval: ReturnType<typeof setInterval> | null = null;
   let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+  let demoTimeout: ReturnType<typeof setTimeout> | null = null;
+  let demoCursor = 0;
 
   // Computed
   const isConnected = computed(() => connectionStatus.value === 'connected');
   const eventCount = computed(() => events.value.length);
+
+  const demoTypes = [
+    'api.request',
+    'db.query',
+    'queue.worker',
+    'auth.login',
+    'cache.hit',
+    'cache.miss',
+    'billing.sync',
+  ];
+  const demoSeverities: Event['severity'][] = ['debug', 'info', 'warn', 'error'];
+  const demoMessages = [
+    'Latency spike detected',
+    'Retrying upstream dependency',
+    'Background job completed',
+    'Circuit breaker opened',
+    'High memory usage',
+    'Authentication failure',
+  ];
+
+  const pick = <T>(items: T[]) => items[Math.floor(Math.random() * items.length)] as T;
+
+  const createDemoEvent = (ts = new Date()) => {
+    const severity = filters.value.severity ?? pick(demoSeverities);
+    const type = filters.value.type || pick(demoTypes);
+    const id =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+    return {
+      id,
+      ts: ts.toISOString(),
+      type,
+      severity,
+      fingerprint: `${type}:${severity}`,
+      payload: {
+        message: pick(demoMessages),
+        latencyMs: Math.floor(40 + Math.random() * 460),
+        statusCode: severity === 'error' ? 500 : severity === 'warn' ? 429 : 200,
+        region: pick(['us-east-1', 'eu-west-1', 'ap-southeast-2']),
+      },
+      cursor: `demo-${++demoCursor}`,
+    } as Event;
+  };
+
+  const pushDemoEvent = () => {
+    const demoEvent = createDemoEvent();
+    events.value = [demoEvent, ...events.value];
+    if (events.value.length > 200) {
+      events.value = events.value.slice(0, 200);
+    }
+  };
+
+  const seedDemoEvents = () => {
+    for (let i = 4; i >= 1; i -= 1) {
+      const seeded = createDemoEvent(new Date(Date.now() - i * 4500));
+      events.value = [seeded, ...events.value];
+    }
+  };
+
+  const scheduleNextDemoEvent = () => {
+    if (!isDemoMode.value) return;
+    const delay = 5000 + Math.random() * 2000;
+    demoTimeout = setTimeout(() => {
+      pushDemoEvent();
+      scheduleNextDemoEvent();
+    }, delay);
+  };
 
   // Subscribe with current filters
   const subscribe = () => {
@@ -183,6 +255,7 @@ export const useEventsStore = defineStore('events', () => {
 
   // Load historical events via REST
   const loadHistory = async () => {
+    if (isDemoMode.value) return;
     if (isLoadingHistory.value || !hasMore.value) return;
 
     isLoadingHistory.value = true;
@@ -220,6 +293,9 @@ export const useEventsStore = defineStore('events', () => {
       subscribe();
     }
     loadHistory();
+    if (isDemoMode.value) {
+      seedDemoEvents();
+    }
   };
 
   // Clear all events
@@ -227,6 +303,24 @@ export const useEventsStore = defineStore('events', () => {
     events.value = [];
     cursor.value = null;
     hasMore.value = true;
+  };
+
+  const startDemoStream = () => {
+    if (demoTimeout) return;
+    isDemoMode.value = true;
+    hasMore.value = false;
+
+    // Seed a few events so the feed isn't empty.
+    seedDemoEvents();
+    scheduleNextDemoEvent();
+  };
+
+  const stopDemoStream = () => {
+    if (demoTimeout) {
+      clearTimeout(demoTimeout);
+      demoTimeout = null;
+    }
+    isDemoMode.value = false;
   };
 
   // Watch for auth changes
@@ -238,6 +332,7 @@ export const useEventsStore = defineStore('events', () => {
       } else {
         disconnect();
         clearEvents();
+        stopDemoStream();
       }
     },
   );
@@ -250,6 +345,7 @@ export const useEventsStore = defineStore('events', () => {
     error,
     hasMore,
     isLoadingHistory,
+    isDemoMode,
     // Computed
     isConnected,
     eventCount,
@@ -259,5 +355,7 @@ export const useEventsStore = defineStore('events', () => {
     loadHistory,
     setFilters,
     clearEvents,
+    startDemoStream,
+    stopDemoStream,
   };
 });

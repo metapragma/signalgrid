@@ -45,6 +45,7 @@ export class IncidentsService {
         status: incident.status,
         title: incident.title,
         createdAt: incident.createdAt.toISOString(),
+        updatedAt: incident.updatedAt.toISOString(),
         commentCount: incident._count.comments,
         eventCount: incident._count.events,
       })),
@@ -85,6 +86,7 @@ export class IncidentsService {
         title: incident.title,
         description: incident.description,
         createdAt: incident.createdAt.toISOString(),
+        updatedAt: incident.updatedAt.toISOString(),
         comments: incident.comments.map((comment) => ({
           id: comment.id,
           body: comment.body,
@@ -191,6 +193,7 @@ export class IncidentsService {
       title: updated.title,
       description: updated.description,
       createdAt: updated.createdAt.toISOString(),
+      updatedAt: updated.updatedAt.toISOString(),
       commentCount: updated._count.comments,
       eventCount: updated._count.events,
     };

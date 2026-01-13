@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Rss, RefreshCw, X, Download, ChevronUp } from 'lucide-vue-next';
+import { Rss, RefreshCw, X, Download, ChevronUp, Search, MoreHorizontal } from 'lucide-vue-next';
 import { useEventsStore, type EventFilters } from '@/stores/events';
 
 const route = useRoute();
@@ -12,6 +12,21 @@ const eventsStore = useEventsStore();
 const localSeverity = ref<EventFilters['severity']>(null);
 const localType = ref('');
 const payloadSearch = ref('');
+const timeRange = ref<'live' | '1h' | '24h'>('live');
+
+const timeRanges = [
+  { value: 'live', label: 'Live' },
+  { value: '1h', label: '1h' },
+  { value: '24h', label: '24h' },
+] as const;
+
+const severityOptions = [
+  { value: null, label: 'All' },
+  { value: 'error', label: 'Error' },
+  { value: 'warn', label: 'Warn' },
+  { value: 'info', label: 'Info' },
+  { value: 'debug', label: 'Debug' },
+] as const;
 
 // Connection status
 const statusClass = computed(() => {
@@ -60,6 +75,10 @@ const formattedServerTime = computed(() => {
   });
 });
 
+const timeRangeLabel = computed(() => {
+  return timeRanges.find((range) => range.value === timeRange.value)?.label ?? 'Live';
+});
+
 // Initialize filters from URL
 const initFiltersFromUrl = () => {
   const severity = route.query.severity as EventFilters['severity'] | undefined;
@@ -98,13 +117,20 @@ const clearFilters = () => {
   payloadSearch.value = '';
   eventsStore.setFilters({ severity: null, type: null });
   router.replace({ query: {} });
+  closeActionMenu();
 };
 
 // Filter payload locally (client-side search)
 const filteredEvents = computed(() => {
-  if (!payloadSearch.value.trim()) return eventsStore.events;
+  let list = eventsStore.events;
+  if (timeRange.value !== 'live') {
+    const now = Date.now();
+    const windowMs = timeRange.value === '1h' ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+    list = list.filter((event) => new Date(event.ts).getTime() >= now - windowMs);
+  }
+  if (!payloadSearch.value.trim()) return list;
   const search = payloadSearch.value.toLowerCase();
-  return eventsStore.events.filter((event) => {
+  return list.filter((event) => {
     const payloadStr = JSON.stringify(event.payload).toLowerCase();
     return payloadStr.includes(search) || event.type.toLowerCase().includes(search);
   });
@@ -170,11 +196,47 @@ const reconnect = () => {
   eventsStore.connect();
 };
 
+const setSeverity = (value: EventFilters['severity']) => {
+  localSeverity.value = value;
+  applyFilters();
+};
+
+let typeTimeout: ReturnType<typeof setTimeout> | null = null;
+const onTypeInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  localType.value = target.value;
+  if (typeTimeout) clearTimeout(typeTimeout);
+  typeTimeout = setTimeout(() => applyFilters(), 250);
+};
+
+const actionMenuOpen = ref(false);
+const actionMenuRef = ref<HTMLElement | null>(null);
+const demoEnabled = import.meta.env.DEV;
+
+const toggleActionMenu = () => {
+  actionMenuOpen.value = !actionMenuOpen.value;
+};
+
+const closeActionMenu = () => {
+  actionMenuOpen.value = false;
+};
+
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as Node;
+  if (actionMenuRef.value && !actionMenuRef.value.contains(target)) {
+    closeActionMenu();
+  }
+};
+
 onMounted(() => {
   initFiltersFromUrl();
+  if (demoEnabled) {
+    eventsStore.startDemoStream();
+  }
   eventsStore.connect();
   eventsStore.loadHistory();
   lastEventCount = eventsStore.events.length;
+  document.addEventListener('click', handleClickOutside);
 
   // Update server time every second
   serverTimeInterval.value = setInterval(() => {
@@ -184,16 +246,20 @@ onMounted(() => {
 
 onUnmounted(() => {
   eventsStore.disconnect();
+  if (demoEnabled) {
+    eventsStore.stopDemoStream();
+  }
   if (serverTimeInterval.value) {
     clearInterval(serverTimeInterval.value);
   }
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
 <template>
   <div class="feed-view">
     <!-- Page Header -->
-    <header class="page-header">
+    <header class="page-header enter-rise">
       <div class="page-title">
         <Rss class="title-icon" />
         <h1>Live Feed</h1>
@@ -212,45 +278,70 @@ onUnmounted(() => {
     </header>
 
     <!-- Filters Bar -->
-    <div class="filters-bar">
+    <div class="filters-bar enter-rise delay-1">
       <div class="filters-left">
-        <div class="filter-group">
-          <label>Severity</label>
-          <select v-model="localSeverity" @change="applyFilters">
-            <option :value="null">All</option>
-            <option value="error">Error</option>
-            <option value="warn">Warn</option>
-            <option value="info">Info</option>
-            <option value="debug">Debug</option>
-          </select>
+        <div class="segmented">
+          <button
+            v-for="option in severityOptions"
+            :key="option.label"
+            type="button"
+            class="segment"
+            :class="{ active: localSeverity === option.value }"
+            @click="setSeverity(option.value)"
+          >
+            {{ option.label }}
+          </button>
         </div>
 
-        <div class="filter-group">
-          <label>Type</label>
-          <select v-model="localType" @change="applyFilters">
-            <option value="">All Types</option>
-          </select>
+        <div class="filter-pill">
+          <Search class="pill-icon" />
+          <input
+            v-model="localType"
+            type="text"
+            placeholder="Type filter"
+            class="pill-input"
+            @input="onTypeInput"
+          />
         </div>
 
-        <div class="filter-group search-group">
+        <div class="filter-pill">
+          <Search class="pill-icon" />
           <input
             v-model="payloadSearch"
             type="text"
             placeholder="Filter payload..."
-            class="search-input"
+            class="pill-input"
           />
+        </div>
+
+        <div class="segmented time-range">
+          <button
+            v-for="range in timeRanges"
+            :key="range.value"
+            type="button"
+            class="segment"
+            :class="{ active: timeRange === range.value }"
+            @click="timeRange = range.value"
+          >
+            {{ range.label }}
+          </button>
         </div>
       </div>
 
-      <div class="filters-right">
-        <button class="filter-btn" @click="clearFilters">
-          <X class="btn-icon" />
-          Clear Filters
+      <div ref="actionMenuRef" class="filters-right">
+        <button class="menu-trigger" type="button" @click.stop="toggleActionMenu">
+          <MoreHorizontal class="btn-icon" />
         </button>
-        <button class="filter-btn">
-          <Download class="btn-icon" />
-          Export
-        </button>
+        <div v-if="actionMenuOpen" class="action-menu" @click.stop>
+          <button type="button" class="action-item" @click="clearFilters">
+            <X class="btn-icon" />
+            Clear filters
+          </button>
+          <button type="button" class="action-item">
+            <Download class="btn-icon" />
+            Export
+          </button>
+        </div>
       </div>
     </div>
 
@@ -297,6 +388,9 @@ onUnmounted(() => {
           v-if="filteredEvents.length === 0 && !eventsStore.isLoadingHistory"
           class="empty-state"
         >
+          <div class="empty-icon">
+            <Rss />
+          </div>
           <p>No events to display</p>
           <p class="empty-hint">Events will appear here in real-time</p>
         </div>
@@ -306,7 +400,7 @@ onUnmounted(() => {
     <!-- Footer -->
     <footer class="page-footer">
       <span class="footer-left"
-        >View: Live Stream • Buffer: {{ eventsStore.events.length }} lines</span
+        >View: {{ timeRangeLabel }} • Buffer: {{ eventsStore.events.length }} lines</span
       >
       <span class="footer-right">Server Time: UTC {{ formattedServerTime }}</span>
     </footer>
@@ -317,8 +411,8 @@ onUnmounted(() => {
 .feed-view {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 56px);
-  background-color: var(--color-sg-bg);
+  height: calc(100vh - 64px);
+  background-color: transparent;
 }
 
 /* Page Header */
@@ -347,7 +441,7 @@ onUnmounted(() => {
 .title-icon {
   width: 20px;
   height: 20px;
-  color: var(--color-sg-text-muted);
+  color: var(--color-sg-text-subtle);
 }
 
 .page-title h1 {
@@ -367,13 +461,13 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-1) var(--space-3);
-  background-color: var(--color-sg-bg-elevated);
-  border-radius: 20px;
+  padding: 6px 12px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
+  border: 1px solid var(--color-sg-border);
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
 }
 
 .status-dot {
@@ -385,7 +479,6 @@ onUnmounted(() => {
 
 .status-connected .status-dot {
   background-color: var(--color-sg-success);
-  box-shadow: 0 0 8px var(--color-sg-success);
 }
 
 .status-connecting .status-dot {
@@ -415,11 +508,11 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background-color: var(--color-sg-bg-hover);
-  border: none;
-  border-radius: 6px;
-  color: var(--color-sg-text-muted);
+  padding: 8px 14px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--color-sg-border);
+  border-radius: 999px;
+  color: var(--color-sg-text-secondary);
   font-size: var(--text-body);
   font-weight: var(--weight-medium);
   line-height: var(--leading-body);
@@ -428,7 +521,7 @@ onUnmounted(() => {
 }
 
 .reconnect-btn:hover {
-  background-color: var(--color-sg-bg-card);
+  background-color: rgba(255, 255, 255, 0.95);
   color: var(--color-sg-text);
 }
 
@@ -443,7 +536,9 @@ onUnmounted(() => {
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
-  background-color: var(--color-sg-bg);
+  background-color: transparent;
+  position: relative;
+  z-index: 20;
 }
 
 @media (min-width: 1024px) {
@@ -462,73 +557,115 @@ onUnmounted(() => {
   align-items: flex-end;
 }
 
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+.segmented {
+  display: inline-flex;
+  padding: 4px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 999px;
+  border: 1px solid var(--color-sg-border);
+  gap: 4px;
 }
 
-.filter-group label {
+.segment {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 999px;
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
-  line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
   color: var(--color-sg-text-muted);
-}
-
-.filter-group select,
-.filter-group input {
-  padding: var(--space-3) var(--space-3);
-  background-color: var(--color-sg-bg-elevated);
-  border: none;
-  border-radius: 8px;
-  color: var(--color-sg-text);
-  font-size: var(--text-body);
-  line-height: var(--leading-body);
-  min-width: 120px;
-}
-
-.search-group {
-  flex: 1;
-  min-width: 200px;
-}
-
-.search-input {
-  width: 100%;
-}
-
-.filters-right {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.filter-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3);
-  background: var(--color-sg-bg-elevated);
-  border: none;
-  border-radius: 8px;
-  color: var(--color-sg-text-muted);
-  font-size: var(--text-micro);
-  font-weight: var(--weight-medium);
-  line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.filter-btn:hover {
-  background-color: var(--color-sg-bg-hover);
+.segment.active {
+  background-color: white;
+  color: var(--color-sg-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px 14px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  border: 1px solid var(--color-sg-border);
+  min-width: 200px;
+}
+
+.pill-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--color-sg-text-subtle);
+}
+
+.pill-input {
+  border: none;
+  background: transparent;
+  color: var(--color-sg-text);
+  width: 100%;
+  font-size: var(--text-body);
+}
+
+.filters-right {
+  position: relative;
+}
+
+.menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--color-sg-border);
+  background-color: rgba(255, 255, 255, 0.95);
+  color: var(--color-sg-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.menu-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.95);
   color: var(--color-sg-text);
 }
 
-.filter-btn .btn-icon {
-  width: 14px;
-  height: 14px;
+.action-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--space-2));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-2);
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--color-sg-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(16px);
+  min-width: 160px;
+  z-index: 40;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--color-sg-text-secondary);
+  font-size: var(--text-body);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.action-item:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: var(--color-sg-text);
 }
 
 /* Events Table */
@@ -538,6 +675,17 @@ onUnmounted(() => {
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  margin: 0 var(--space-4) var(--space-6);
+  border-radius: 18px;
+  border: 1px solid var(--color-sg-border);
+  background: var(--color-sg-bg-card);
+  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 768px) {
+  .events-table-wrapper {
+    margin: 0 var(--space-8) var(--space-6);
+  }
 }
 
 .new-events-btn {
@@ -552,13 +700,13 @@ onUnmounted(() => {
   padding: var(--space-2) var(--space-4);
   background-color: var(--color-sg-accent);
   border: none;
-  border-radius: 20px;
-  color: var(--color-sg-bg);
+  border-radius: 999px;
+  color: white;
   font-size: var(--text-body);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-body);
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 203, 179, 0.28);
   transition:
     transform 0.15s,
     box-shadow 0.15s;
@@ -566,7 +714,7 @@ onUnmounted(() => {
 
 .new-events-btn:hover {
   transform: translateX(-50%) scale(1.02);
-  box-shadow: 0 6px 16px rgba(34, 211, 238, 0.4);
+  box-shadow: 0 10px 24px rgba(0, 203, 179, 0.35);
 }
 
 .new-events-btn .btn-icon {
@@ -579,17 +727,16 @@ onUnmounted(() => {
   grid-template-columns: 120px 90px 180px 1fr;
   gap: var(--space-4);
   padding: var(--space-3) var(--space-4);
-  background-color: var(--color-sg-bg);
-  box-shadow: var(--shadow-sm);
+  background-color: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--color-sg-border);
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-sg-text-subtle);
+  color: var(--color-sg-text-secondary);
   position: sticky;
   top: 0;
   z-index: 5;
+  backdrop-filter: blur(18px);
 }
 
 @media (min-width: 768px) {
@@ -614,6 +761,7 @@ onUnmounted(() => {
   transition: background-color 0.15s;
   min-width: 600px;
   border-left: 2px solid transparent;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.04);
 }
 
 @media (min-width: 768px) {
@@ -623,7 +771,11 @@ onUnmounted(() => {
 }
 
 .event-row:hover {
-  background-color: var(--color-sg-bg-hover);
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+.event-row:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
 .event-row.severity-error {
@@ -655,18 +807,17 @@ onUnmounted(() => {
   font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-micro);
-  border-radius: 4px;
-  letter-spacing: var(--tracking-wide);
+  border-radius: 999px;
 }
 
 .severity-badge.severity-error {
-  background-color: var(--color-sg-error);
-  color: white;
+  background-color: var(--color-sg-error-subtle);
+  color: var(--color-sg-error);
 }
 
 .severity-badge.severity-warn {
-  background-color: var(--color-sg-warn);
-  color: var(--color-sg-bg);
+  background-color: var(--color-sg-warn-subtle);
+  color: var(--color-sg-warn);
 }
 
 .severity-badge.severity-info {
@@ -702,6 +853,13 @@ onUnmounted(() => {
   color: var(--color-sg-text-muted);
 }
 
+.empty-icon {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto var(--space-3);
+  color: var(--color-sg-text-subtle);
+}
+
 .empty-hint {
   margin-top: var(--space-2);
   font-size: var(--text-body);
@@ -713,11 +871,10 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   padding: var(--space-3) var(--space-4);
-  background-color: var(--color-sg-bg);
+  background-color: transparent;
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
   color: var(--color-sg-text-subtle);
 }
 

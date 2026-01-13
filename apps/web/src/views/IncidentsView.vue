@@ -96,7 +96,7 @@ const getShortId = (id: string) => {
 <template>
   <div class="incidents-view">
     <!-- Page Header -->
-    <header class="page-header">
+    <header class="page-header enter-rise">
       <div class="header-content">
         <h1 class="page-title">Incidents</h1>
         <p class="page-subtitle">
@@ -118,8 +118,7 @@ const getShortId = (id: string) => {
           :class="{ active: statusFilter === 'all' }"
           @click="statusFilter = 'all'"
         >
-          All Status
-          <ChevronDown class="pill-icon" />
+          All
         </button>
         <button
           class="filter-pill"
@@ -156,7 +155,7 @@ const getShortId = (id: string) => {
     </div>
 
     <!-- Content -->
-    <div class="incidents-content">
+    <div class="incidents-content enter-rise delay-1">
       <!-- Error -->
       <div v-if="incidentsStore.error" class="error-banner">
         {{ incidentsStore.error }}
@@ -229,8 +228,8 @@ const getShortId = (id: string) => {
 
 <style scoped>
 .incidents-view {
-  min-height: calc(100vh - 56px);
-  background-color: var(--color-sg-bg);
+  min-height: calc(100vh - 64px);
+  background-color: transparent;
 }
 
 /* Page Header */
@@ -284,27 +283,28 @@ const getShortId = (id: string) => {
   height: 8px;
   border-radius: 50%;
   background-color: var(--color-sg-success);
-  box-shadow: 0 0 8px var(--color-sg-success);
 }
 
 .create-btn {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
+  padding: 10px 16px;
   background-color: var(--color-sg-accent);
   border: none;
-  border-radius: 8px;
-  color: var(--color-sg-bg);
+  border-radius: 999px;
+  color: white;
   font-size: var(--text-body);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-body);
   cursor: pointer;
   transition: all 0.15s;
+  box-shadow: var(--shadow-sm);
 }
 
 .create-btn:hover {
-  background-color: var(--color-sg-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .create-btn .btn-icon {
@@ -333,16 +333,20 @@ const getShortId = (id: string) => {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  padding: 4px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
+  border: 1px solid var(--color-sg-border);
 }
 
 .filter-pill {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--color-sg-bg-elevated);
+  padding: 6px 12px;
+  background-color: transparent;
   border: none;
-  border-radius: 20px;
+  border-radius: 999px;
   color: var(--color-sg-text-muted);
   font-size: var(--text-body);
   font-weight: var(--weight-medium);
@@ -352,12 +356,13 @@ const getShortId = (id: string) => {
 }
 
 .filter-pill:hover {
-  background-color: var(--color-sg-bg-hover);
+  background-color: rgba(255, 255, 255, 0.7);
   color: var(--color-sg-text);
 }
 
 .filter-pill.active {
-  background-color: var(--color-sg-bg-card);
+  background-color: white;
+  box-shadow: var(--shadow-sm);
   color: var(--color-sg-text);
 }
 
@@ -368,8 +373,10 @@ const getShortId = (id: string) => {
 
 .view-toggle {
   display: flex;
-  background-color: var(--color-sg-bg-elevated);
-  border-radius: 8px;
+  padding: 4px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
+  border: 1px solid var(--color-sg-border);
   overflow: hidden;
 }
 
@@ -391,8 +398,9 @@ const getShortId = (id: string) => {
 }
 
 .toggle-btn.active {
-  background-color: var(--color-sg-bg-card);
+  background-color: rgba(255, 255, 255, 0.95);
   color: var(--color-sg-text);
+  box-shadow: var(--shadow-sm);
 }
 
 .toggle-icon {
@@ -415,7 +423,8 @@ const getShortId = (id: string) => {
   margin-bottom: var(--space-4);
   padding: var(--space-4);
   background-color: var(--color-sg-error-muted);
-  border-radius: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 69, 58, 0.2);
   color: var(--color-sg-error);
   font-size: var(--text-body);
   line-height: var(--leading-body);
@@ -431,8 +440,8 @@ const getShortId = (id: string) => {
 .spinner {
   width: 32px;
   height: 32px;
-  border: 2px solid var(--color-sg-bg-hover);
-  border-top-color: var(--color-sg-text-muted);
+  border: 2px solid rgba(15, 23, 42, 0.16);
+  border-top-color: var(--color-sg-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -458,8 +467,9 @@ const getShortId = (id: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-sg-bg-elevated);
-  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 14px;
+  border: 1px solid var(--color-sg-border);
   margin-bottom: var(--space-4);
   color: var(--color-sg-text-muted);
 }
@@ -489,14 +499,18 @@ const getShortId = (id: string) => {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  max-width: 900px;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .incidents-container.view-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
   gap: var(--space-4);
   max-width: none;
+  justify-content: center;
+  justify-items: center;
 }
 
 .incident-card {
@@ -504,8 +518,10 @@ const getShortId = (id: string) => {
   align-items: center;
   justify-content: space-between;
   padding: var(--space-4) var(--space-6);
-  background-color: var(--color-sg-bg-card);
-  border-radius: 16px;
+  background-color: white;
+  border-radius: 18px;
+  border: 1px solid var(--color-sg-border);
+  backdrop-filter: blur(8px);
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -518,16 +534,25 @@ const getShortId = (id: string) => {
 /* Grid card variant */
 .incident-card.card-grid {
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
+  text-align: center;
 }
 
 .incident-card.card-grid .card-left {
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .incident-card.card-grid .status-icon {
   margin-bottom: var(--space-3);
+}
+
+.incident-card.card-grid .card-meta {
+  justify-content: center;
+}
+
+.incident-card.card-grid .incident-details {
+  text-align: center;
 }
 
 .card-left {
@@ -537,27 +562,27 @@ const getShortId = (id: string) => {
 }
 
 .status-icon {
-  width: 40px;
-  height: 40px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
 .status-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
 }
 
 .status-icon.status-open {
-  background: linear-gradient(135deg, var(--color-sg-success) 0%, #2ea043 100%);
-  color: white;
+  background: rgba(18, 183, 106, 0.12);
+  color: var(--color-sg-success);
 }
 
 .status-icon.status-resolved {
-  background-color: var(--color-sg-bg-card);
+  background-color: rgba(15, 23, 42, 0.08);
   color: var(--color-sg-text-muted);
 }
 
@@ -580,8 +605,6 @@ const getShortId = (id: string) => {
   font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
 }
 
 .status-badge.status-open {
@@ -625,20 +648,22 @@ const getShortId = (id: string) => {
   justify-content: center;
   gap: var(--space-2);
   width: 100%;
-  padding: var(--space-3);
+  padding: 10px 16px;
   margin-top: var(--space-3);
-  background: none;
-  border: none;
-  color: var(--color-sg-text-muted);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--color-sg-border);
+  color: var(--color-sg-text-secondary);
   font-size: var(--text-body);
   font-weight: var(--weight-medium);
   line-height: var(--leading-body);
   cursor: pointer;
-  transition: color 0.15s;
+  transition: all 0.15s;
+  border-radius: 999px;
 }
 
 .load-more-btn:hover {
   color: var(--color-sg-text);
+  background-color: rgba(255, 255, 255, 0.95);
 }
 
 .load-more-btn .btn-icon {

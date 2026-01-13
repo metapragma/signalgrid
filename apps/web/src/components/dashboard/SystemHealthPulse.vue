@@ -113,20 +113,23 @@ const pulseClass = computed(() => `pulse-${status.value}`);
   inset: 42px;
   border-radius: 50%;
   background: currentColor;
-  box-shadow: 0 0 15px currentColor, 0 0 25px currentColor;
+  box-shadow: 0 0 12px currentColor, 0 0 18px var(--pulse-glow);
 }
 
-/* Status colors - refined palette */
+/* Status colors - neon palette */
 .status-healthy {
-  color: #34d399; /* emerald-400 */
+  color: var(--color-sg-success);
+  --pulse-glow: rgba(46, 230, 166, 0.28);
 }
 
 .status-degraded {
-  color: #fbbf24; /* amber-400 */
+  color: var(--color-sg-warn);
+  --pulse-glow: rgba(240, 163, 67, 0.28);
 }
 
 .status-critical {
-  color: #fb7185; /* rose-400 */
+  color: var(--color-sg-error);
+  --pulse-glow: rgba(255, 59, 48, 0.28);
 }
 
 /* Healthy pulse - slow, calm */
@@ -165,11 +168,11 @@ const pulseClass = computed(() => `pulse-${status.value}`);
 @keyframes glow-healthy {
   0%,
   100% {
-    box-shadow: 0 0 10px currentColor, 0 0 20px rgba(52, 211, 153, 0.2);
+    box-shadow: 0 0 8px currentColor, 0 0 16px var(--pulse-glow);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 18px currentColor, 0 0 35px rgba(52, 211, 153, 0.35);
+    box-shadow: 0 0 14px currentColor, 0 0 24px var(--pulse-glow);
     transform: scale(1.03);
   }
 }
@@ -210,11 +213,11 @@ const pulseClass = computed(() => `pulse-${status.value}`);
 @keyframes glow-degraded {
   0%,
   100% {
-    box-shadow: 0 0 12px currentColor, 0 0 22px rgba(251, 191, 36, 0.2);
+    box-shadow: 0 0 10px currentColor, 0 0 18px var(--pulse-glow);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 22px currentColor, 0 0 40px rgba(251, 191, 36, 0.35);
+    box-shadow: 0 0 16px currentColor, 0 0 26px var(--pulse-glow);
     transform: scale(1.05);
   }
 }
@@ -255,11 +258,11 @@ const pulseClass = computed(() => `pulse-${status.value}`);
 @keyframes glow-critical {
   0%,
   100% {
-    box-shadow: 0 0 15px currentColor, 0 0 30px rgba(251, 113, 133, 0.3);
+    box-shadow: 0 0 12px currentColor, 0 0 20px var(--pulse-glow);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 28px currentColor, 0 0 50px rgba(251, 113, 133, 0.45);
+    box-shadow: 0 0 20px currentColor, 0 0 32px var(--pulse-glow);
     transform: scale(1.07);
   }
 }
@@ -273,26 +276,24 @@ const pulseClass = computed(() => `pulse-${status.value}`);
   font-size: var(--text-body);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-body);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
   margin-bottom: var(--space-1);
 }
 
 .status-healthy .health-label {
-  color: #34d399;
+  color: var(--color-sg-success);
 }
 
 .status-degraded .health-label {
-  color: #fbbf24;
+  color: var(--color-sg-warn);
 }
 
 .status-critical .health-label {
-  color: #fb7185;
+  color: var(--color-sg-error);
 }
 
 .health-description {
-  font-size: var(--text-micro);
-  line-height: var(--leading-micro);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
 }
 </style>

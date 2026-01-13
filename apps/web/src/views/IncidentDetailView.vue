@@ -13,6 +13,7 @@ import {
   Bell,
   AlertCircle,
   AlertTriangle,
+  CheckCircle,
 } from 'lucide-vue-next';
 import { useIncidentsStore } from '@/stores/incidents';
 
@@ -26,6 +27,10 @@ const isAddingComment = ref(false);
 const incidentId = computed(() => route.params.id as string);
 const incident = computed(() => incidentsStore.currentIncident);
 const isOpen = computed(() => incident.value?.status === 'OPEN');
+const resolvedAt = computed(() => {
+  if (!incident.value || incident.value.status !== 'CLOSED') return '';
+  return incident.value.updatedAt || incident.value.createdAt;
+});
 
 const shortId = computed(() => {
   if (!incident.value) return '';
@@ -155,7 +160,7 @@ onUnmounted(() => {
     <!-- Content -->
     <div v-else-if="incident" class="content">
       <!-- Incident Header -->
-      <header class="incident-header">
+      <header class="incident-header enter-rise">
         <div class="header-top">
           <div class="header-left">
             <div class="status-row">
@@ -201,7 +206,7 @@ onUnmounted(() => {
       </header>
 
       <!-- Two Column Layout -->
-      <div class="two-columns">
+      <div class="two-columns enter-rise delay-1">
         <!-- Left Column -->
         <div class="left-column">
           <!-- Description -->
@@ -339,6 +344,22 @@ onUnmounted(() => {
                 </div>
               </div>
 
+              <!-- Resolved -->
+              <div v-if="incident.status === 'CLOSED'" class="timeline-item resolved-item">
+                <div class="timeline-icon resolved-icon">
+                  <CheckCircle class="icon" />
+                </div>
+                <div class="timeline-content">
+                  <div class="timeline-header">
+                    <span class="timeline-label resolved">Incident Resolved</span>
+                    <span class="timeline-time">{{ formatCommentTime(resolvedAt) }}</span>
+                  </div>
+                  <div class="timeline-system-text">
+                    Status updated to <strong>Resolved</strong>
+                  </div>
+                </div>
+              </div>
+
               <!-- Empty State -->
               <div v-if="incident.comments.length === 0" class="timeline-empty">
                 <p>Timeline will show activity as the incident progresses</p>
@@ -353,8 +374,8 @@ onUnmounted(() => {
 
 <style scoped>
 .incident-detail {
-  min-height: calc(100vh - 56px);
-  background-color: var(--color-sg-bg);
+  min-height: calc(100vh - 64px);
+  background-color: transparent;
   padding-bottom: 40px;
 }
 
@@ -373,17 +394,20 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  background: none;
-  border: none;
-  color: var(--color-sg-text-muted);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--color-sg-border);
+  color: var(--color-sg-text-secondary);
   font-size: var(--text-body);
   line-height: var(--leading-body);
   cursor: pointer;
-  transition: color 0.15s;
+  transition: all 0.15s;
+  padding: 6px 12px;
+  border-radius: 999px;
 }
 
 .back-link:hover {
   color: var(--color-sg-text);
+  background-color: rgba(255, 255, 255, 0.95);
 }
 
 .back-icon {
@@ -402,8 +426,8 @@ onUnmounted(() => {
 .spinner {
   width: 32px;
   height: 32px;
-  border: 2px solid var(--color-sg-bg-hover);
-  border-top-color: var(--color-sg-text-muted);
+  border: 2px solid rgba(15, 23, 42, 0.16);
+  border-top-color: var(--color-sg-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -418,7 +442,8 @@ onUnmounted(() => {
   margin: 16px;
   padding: 14px 18px;
   background-color: var(--color-sg-error-muted);
-  border-radius: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 69, 58, 0.2);
   color: var(--color-sg-error);
   font-size: 14px;
 }
@@ -470,20 +495,19 @@ onUnmounted(() => {
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-1) var(--space-3);
-  border-radius: 20px;
+  border-radius: 999px;
   font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
 }
 
 .status-badge.open {
-  background-color: rgba(52, 211, 153, 0.12);
+  background-color: var(--color-sg-success-subtle);
   color: var(--color-sg-success);
 }
 
 .status-badge.closed {
-  background-color: var(--color-sg-bg-elevated);
+  background-color: rgba(15, 23, 42, 0.08);
   color: var(--color-sg-text-muted);
 }
 
@@ -546,16 +570,21 @@ onUnmounted(() => {
 
 .header-actions {
   display: flex;
-  gap: 12px;
+  gap: 6px;
   flex-shrink: 0;
+  padding: 4px;
+  border-radius: 999px;
+  background-color: var(--color-sg-bg-elevated);
+  border: 1px solid var(--color-sg-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .action-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -563,19 +592,20 @@ onUnmounted(() => {
 }
 
 .action-btn.secondary {
-  background-color: var(--color-sg-bg-elevated);
+  background-color: transparent;
   border: none;
-  color: var(--color-sg-text);
+  color: var(--color-sg-text-secondary);
 }
 
 .action-btn.secondary:hover {
   background-color: var(--color-sg-bg-hover);
+  color: var(--color-sg-text);
 }
 
 .action-btn.primary {
   background-color: var(--color-sg-accent);
   border: none;
-  color: var(--color-sg-bg);
+  color: white;
 }
 
 .action-btn.primary:hover {
@@ -612,12 +642,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: var(--text-micro);
-  font-weight: var(--weight-semibold);
-  line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-sg-text-muted);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-body);
+  color: var(--color-sg-text-secondary);
 }
 
 .section-icon {
@@ -642,9 +670,11 @@ onUnmounted(() => {
 
 /* Description */
 .description-card {
-  background-color: var(--color-sg-bg-card);
-  border-radius: 16px;
+  background-color: white;
+  border-radius: 18px;
   padding: 24px;
+  border: 1px solid var(--color-sg-border);
+  backdrop-filter: blur(8px);
 }
 
 .description-text {
@@ -662,9 +692,11 @@ onUnmounted(() => {
 
 /* Events Table */
 .events-table {
-  background-color: var(--color-sg-bg-card);
-  border-radius: 16px;
+  background-color: white;
+  border-radius: 18px;
   overflow: hidden;
+  border: 1px solid var(--color-sg-border);
+  backdrop-filter: blur(8px);
 }
 
 .table-header {
@@ -672,13 +704,11 @@ onUnmounted(() => {
   grid-template-columns: 90px 140px 1fr;
   gap: var(--space-4);
   padding: var(--space-3) var(--space-4);
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.96);
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-sg-text-subtle);
+  color: var(--color-sg-text-secondary);
 }
 
 .table-body {
@@ -696,7 +726,7 @@ onUnmounted(() => {
 }
 
 .table-row:hover {
-  background-color: var(--color-sg-bg-hover);
+  background-color: rgba(255, 255, 255, 0.85);
 }
 
 .col-timestamp {
@@ -743,8 +773,10 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 40px;
-  background-color: var(--color-sg-bg-card);
-  border-radius: 16px;
+  background-color: white;
+  border-radius: 18px;
+  border: 1px solid var(--color-sg-border);
+  backdrop-filter: blur(8px);
   text-align: center;
 }
 
@@ -765,9 +797,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--color-sg-bg-elevated);
-  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
   padding: 6px 6px 6px 18px;
+  border: 1px solid var(--color-sg-border);
   margin-bottom: 24px;
 }
 
@@ -790,17 +823,17 @@ onUnmounted(() => {
   justify-content: center;
   width: 36px;
   height: 36px;
-  background-color: var(--color-sg-bg-card);
-  border: none;
-  border-radius: 6px;
-  color: var(--color-sg-text-muted);
+  background-color: var(--color-sg-bg-elevated);
+  border: 1px solid var(--color-sg-border);
+  border-radius: 999px;
+  color: var(--color-sg-text-secondary);
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .send-btn:hover:not(:disabled) {
   background-color: var(--color-sg-accent);
-  color: var(--color-sg-bg);
+  color: white;
 }
 
 .send-btn:disabled {
@@ -817,6 +850,18 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
+  padding-left: 18px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 6px;
+  width: 2px;
+  background-color: var(--color-sg-accent-muted);
 }
 
 .timeline-item {
@@ -828,13 +873,13 @@ onUnmounted(() => {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background-color: var(--color-sg-accent-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
   font-weight: 600;
-  color: white;
+  color: var(--color-sg-text);
   flex-shrink: 0;
 }
 
@@ -854,13 +899,18 @@ onUnmounted(() => {
 }
 
 .timeline-icon.system-icon {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--color-sg-bg-active);
   color: var(--color-sg-text-muted);
 }
 
 .timeline-icon.alert-icon {
-  background-color: rgba(251, 113, 133, 0.12);
+  background-color: var(--color-sg-error-subtle);
   color: var(--color-sg-error);
+}
+
+.timeline-icon.resolved-icon {
+  background-color: var(--color-sg-success-subtle);
+  color: var(--color-sg-success);
 }
 
 .timeline-content {
@@ -884,7 +934,6 @@ onUnmounted(() => {
 .timeline-label {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.02em;
 }
 
 .timeline-label.system {
@@ -895,18 +944,24 @@ onUnmounted(() => {
   color: var(--color-sg-error);
 }
 
+.timeline-label.resolved {
+  color: var(--color-sg-success);
+}
+
 .timeline-time {
   font-size: 12px;
   color: var(--color-sg-text-subtle);
 }
 
 .timeline-message {
-  background-color: var(--color-sg-bg-card);
-  border-radius: 12px;
+  background-color: white;
+  border-radius: 16px;
   padding: 14px;
   font-size: 14px;
   color: var(--color-sg-text-muted);
   line-height: 1.5;
+  border: 1px solid var(--color-sg-border);
+  backdrop-filter: blur(8px);
 }
 
 .timeline-system-text {
@@ -922,9 +977,9 @@ onUnmounted(() => {
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--color-sg-text);
-  background-color: var(--color-sg-bg-elevated);
+  background-color: rgba(255, 255, 255, 0.8);
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .timeline-empty {

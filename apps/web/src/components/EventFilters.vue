@@ -109,7 +109,9 @@ watch(
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  background-color: var(--color-sg-bg-elevated);
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--color-sg-border);
+  border-radius: 16px;
 }
 
 @media (min-width: 480px) {
@@ -136,16 +138,14 @@ watch(
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-sg-text-muted);
+  color: var(--color-sg-text-secondary);
 }
 
 .filter-group select,
 .filter-group input {
-  background-color: var(--color-sg-bg-card);
-  border: none;
-  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--color-sg-border);
+  border-radius: 999px;
   padding: var(--space-2) var(--space-3);
   color: var(--color-sg-text);
   font-size: var(--text-body);
@@ -164,7 +164,6 @@ watch(
 .filter-group select:focus,
 .filter-group input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .filter-group select {

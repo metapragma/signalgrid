@@ -22,10 +22,10 @@ const emit = defineEmits<{
 }>();
 
 const textareaClasses = [
-  'w-full px-4 py-3 text-sm text-zinc-100 bg-[--color-sg-bg-elevated]',
-  'border-0 rounded-lg',
-  'placeholder:text-zinc-500',
-  'focus:outline-none focus:ring-1 focus:ring-white/10',
+  'w-full px-4 py-2.5 text-sm text-[--color-sg-text] bg-white',
+  'border border-[--color-sg-border] rounded-xl',
+  'placeholder:text-[--color-sg-text-subtle]',
+  'focus:outline-none',
   'disabled:opacity-50 disabled:cursor-not-allowed',
   'transition-all resize-none',
 ];
@@ -38,7 +38,7 @@ const onInput = (event: Event) => {
 
 <template>
   <div class="space-y-1.5">
-    <label v-if="label" class="block text-xs font-medium text-zinc-400 uppercase tracking-wide">
+    <label v-if="label" class="block text-xs font-medium text-[--color-sg-text-muted]">
       {{ label }}
     </label>
     <textarea

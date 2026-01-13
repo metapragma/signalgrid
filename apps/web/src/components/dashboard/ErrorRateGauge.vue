@@ -1,33 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, watch, shallowRef } from 'vue';
-import * as echarts from 'echarts/core';
-import { GaugeChart } from 'echarts/charts';
-import { CanvasRenderer } from 'echarts/renderers';
-import type { EChartsOption } from 'echarts';
-
-// Register ECharts components
-echarts.use([GaugeChart, CanvasRenderer]);
+import { computed } from 'vue';
 
 const props = defineProps<{
   value: number; // 0-1 range (e.g., 0.05 = 5%)
   isLoading?: boolean;
 }>();
 
-const chartRef = ref<HTMLDivElement | null>(null);
-const chart = shallowRef<echarts.ECharts | null>(null);
-
-// Design system colors - refined palette
-const colors = {
-  healthy: '#34d399', // emerald-400
-  degraded: '#fbbf24', // amber-400
-  critical: '#fb7185', // rose-400
-  bg: '#141417',
-  text: '#71717a', // zinc-500
-  textLight: '#ececf1',
-};
-
 const percentage = computed(() => Math.round(props.value * 100 * 100) / 100);
-const maxValue = 15; // Max display is 15%
+const maxValue = 15;
 
 const status = computed(() => {
   if (percentage.value >= 10) return 'critical';
@@ -35,126 +15,47 @@ const status = computed(() => {
   return 'healthy';
 });
 
-const statusColor = computed(() => colors[status.value]);
-
-const chartOption = computed<EChartsOption>(() => ({
-  animation: true,
-  animationDuration: 1000,
-  animationEasing: 'elasticOut',
-  series: [
-    {
-      type: 'gauge',
-      startAngle: 180,
-      endAngle: 0,
-      center: ['50%', '70%'],
-      radius: '100%',
-      min: 0,
-      max: maxValue,
-      splitNumber: 3,
-      axisLine: {
-        lineStyle: {
-          width: 20,
-          color: [
-            [0.33, colors.healthy],
-            [0.66, colors.degraded],
-            [1, colors.critical],
-          ],
-        },
-      },
-      pointer: {
-        icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
-        length: '60%',
-        width: 8,
-        offsetCenter: [0, '-15%'],
-        itemStyle: {
-          color: 'auto',
-        },
-      },
-      axisTick: {
-        length: 8,
-        lineStyle: {
-          color: 'auto',
-          width: 1,
-        },
-      },
-      splitLine: {
-        length: 15,
-        lineStyle: {
-          color: 'auto',
-          width: 2,
-        },
-      },
-      axisLabel: {
-        color: colors.text,
-        fontSize: 10,
-        distance: 25,
-        formatter: (value: number) => `${value}%`,
-      },
-      title: {
-        show: false,
-      },
-      detail: {
-        fontSize: 28,
-        fontWeight: 700,
-        fontFamily: 'JetBrains Mono, SF Mono, monospace',
-        offsetCenter: [0, '20%'],
-        valueAnimation: true,
-        formatter: (value: number) => `${value.toFixed(2)}%`,
-        color: statusColor.value,
-      },
-      data: [
-        {
-          value: Math.min(percentage.value, maxValue),
-        },
-      ],
-    },
-  ],
-}));
-
-const initChart = () => {
-  if (!chartRef.value) return;
-
-  chart.value = echarts.init(chartRef.value, undefined, {
-    renderer: 'canvas',
-  });
-
-  chart.value.setOption(chartOption.value);
-};
-
-const updateChart = () => {
-  if (chart.value) {
-    chart.value.setOption(chartOption.value, {
-      notMerge: false,
-      lazyUpdate: false,
-    });
-  }
-};
-
-const handleResize = () => {
-  chart.value?.resize();
-};
-
-onMounted(() => {
-  initChart();
-  window.addEventListener('resize', handleResize);
+const statusText = computed(() => status.value.charAt(0).toUpperCase() + status.value.slice(1));
+const indicatorPosition = computed(() => {
+  const clamped = Math.min(Math.max(percentage.value, 0), maxValue);
+  const pct = (clamped / maxValue) * 100;
+  return Math.min(Math.max(pct, 2), 98);
 });
-
-watch(
-  () => props.value,
-  () => {
-    updateChart();
-  },
-);
 </script>
 
 <template>
-  <div class="gauge-container">
+  <div class="gauge-container" :class="`status-${status}`">
+    <div class="gauge-header">
+      <div class="gauge-value">{{ percentage.toFixed(2) }}%</div>
+      <div class="gauge-caption">Error rate (last hour)</div>
+    </div>
+
+    <div class="gauge-meter">
+      <div class="meter-track">
+        <div class="track-segment segment-healthy"></div>
+        <div class="track-segment segment-degraded"></div>
+        <div class="track-segment segment-critical"></div>
+        <div
+          class="meter-indicator"
+          :style="{ left: `${indicatorPosition}%` }"
+        >
+          <span class="indicator-dot"></span>
+        </div>
+      </div>
+      <div class="meter-scale">
+        <span>0%</span>
+        <span>5%</span>
+        <span>10%</span>
+        <span>15%</span>
+      </div>
+    </div>
+
+    <div class="gauge-status" :class="`status-${status}`">
+      {{ statusText }}
+    </div>
+
     <div v-if="isLoading" class="gauge-loading">
       <div class="spinner"></div>
-    </div>
-    <div ref="chartRef" class="gauge-chart"></div>
-    <div class="gauge-status" :class="`status-${status}`">
-      {{ status.toUpperCase() }}
     </div>
   </div>
 </template>
@@ -162,41 +63,128 @@ watch(
 <style scoped>
 .gauge-container {
   position: relative;
-  width: 100%;
-  height: 180px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  --indicator-color: var(--color-sg-accent);
+  --indicator-glow: var(--color-sg-accent-subtle);
 }
 
-.gauge-chart {
-  width: 100%;
-  height: 160px;
+.gauge-container.status-healthy {
+  --indicator-color: var(--color-sg-success);
+  --indicator-glow: var(--color-sg-success-subtle);
+}
+
+.gauge-container.status-degraded {
+  --indicator-color: var(--color-sg-warn);
+  --indicator-glow: var(--color-sg-warn-subtle);
+}
+
+.gauge-container.status-critical {
+  --indicator-color: var(--color-sg-error);
+  --indicator-glow: var(--color-sg-error-subtle);
+}
+
+.gauge-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gauge-value {
+  font-size: 32px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-sg-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.gauge-caption {
+  font-size: var(--text-micro);
+  color: var(--color-sg-text-muted);
+}
+
+.gauge-meter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.meter-track {
+  position: relative;
+  display: flex;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  background-color: var(--color-sg-bg-active);
+  border: 1px solid var(--color-sg-border);
+}
+
+.track-segment {
+  flex: 1;
+}
+
+.segment-healthy {
+  background-color: var(--color-sg-success);
+}
+
+.segment-degraded {
+  background-color: var(--color-sg-warn);
+}
+
+.segment-critical {
+  background-color: var(--color-sg-error);
+}
+
+.meter-indicator {
+  position: absolute;
+  top: -6px;
+  transform: translateX(-50%);
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.indicator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--indicator-color);
+  box-shadow: 0 0 0 4px var(--indicator-glow);
+  border: 1px solid var(--color-sg-bg-elevated);
+}
+
+.meter-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-micro);
+  color: var(--color-sg-text-subtle);
+  padding: 0 2px;
 }
 
 .gauge-status {
+  align-self: flex-start;
   font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  padding: var(--space-1) var(--space-3);
-  border-radius: 12px;
-  margin-top: -20px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--color-sg-border);
+  background-color: var(--color-sg-bg-elevated);
 }
 
 .gauge-status.status-healthy {
-  background-color: rgba(52, 211, 153, 0.12);
-  color: #34d399;
+  color: var(--color-sg-success);
 }
 
 .gauge-status.status-degraded {
-  background-color: rgba(251, 191, 36, 0.12);
-  color: #fbbf24;
+  color: var(--color-sg-warn);
 }
 
 .gauge-status.status-critical {
-  background-color: rgba(251, 113, 133, 0.12);
-  color: #fb7185;
+  color: var(--color-sg-error);
 }
 
 .gauge-loading {
@@ -205,15 +193,16 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(13, 17, 23, 0.8);
+  background-color: rgba(251, 250, 247, 0.82);
+  border-radius: 16px;
   z-index: 10;
 }
 
 .spinner {
   width: 24px;
   height: 24px;
-  border: 2px solid var(--color-sg-bg-hover);
-  border-top-color: var(--color-sg-text-muted);
+  border: 2px solid rgba(12, 56, 44, 0.16);
+  border-top-color: var(--color-sg-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

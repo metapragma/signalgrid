@@ -38,16 +38,16 @@ const props = defineProps<{
 const chartRef = ref<HTMLDivElement | null>(null);
 const chart = shallowRef<echarts.ECharts | null>(null);
 
-// Design system colors - refined palette
+// Design system colors - glacial tide palette
 const colors = {
-  error: '#fb7185', // rose-400
-  warn: '#fbbf24', // amber-400
-  info: '#38bdf8', // sky-400
-  debug: '#94a3b8', // slate-400
-  bg: '#09090b',
-  grid: '#1e1e22',
-  text: '#71717a', // zinc-500
-  textLight: '#ececf1',
+  error: '#ff3b30',
+  warn: '#f0a343',
+  info: '#00c7ff',
+  debug: '#7b9b8f',
+  bg: '#fbfaf7',
+  grid: 'rgba(28, 32, 30, 0.18)',
+  text: '#46534f',
+  textLight: '#101b18',
 };
 
 const chartOption = computed<EChartsOption>(() => {
@@ -64,9 +64,9 @@ const chartOption = computed<EChartsOption>(() => {
     animationEasing: 'cubicOut',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(22, 22, 24, 0.95)',
-      borderColor: 'transparent',
-      borderWidth: 0,
+      backgroundColor: 'rgba(251, 250, 247, 0.96)',
+      borderColor: 'rgba(28, 32, 30, 0.18)',
+      borderWidth: 1,
       textStyle: {
         color: colors.textLight,
         fontSize: 12,
@@ -168,10 +168,7 @@ const chartOption = computed<EChartsOption>(() => {
         symbol: 'none',
         lineStyle: { width: 0 },
         areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(251, 113, 133, 0.8)' },
-            { offset: 1, color: 'rgba(251, 113, 133, 0.1)' },
-          ]),
+          color: 'rgba(255, 59, 48, 0.32)',
         },
         emphasis: {
           focus: 'series',
@@ -186,10 +183,7 @@ const chartOption = computed<EChartsOption>(() => {
         symbol: 'none',
         lineStyle: { width: 0 },
         areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(251, 191, 36, 0.8)' },
-            { offset: 1, color: 'rgba(251, 191, 36, 0.1)' },
-          ]),
+          color: 'rgba(240, 163, 67, 0.3)',
         },
         emphasis: {
           focus: 'series',
@@ -204,10 +198,7 @@ const chartOption = computed<EChartsOption>(() => {
         symbol: 'none',
         lineStyle: { width: 0 },
         areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(56, 189, 248, 0.8)' },
-            { offset: 1, color: 'rgba(56, 189, 248, 0.1)' },
-          ]),
+          color: 'rgba(0, 199, 255, 0.28)',
         },
         emphasis: {
           focus: 'series',
@@ -222,10 +213,7 @@ const chartOption = computed<EChartsOption>(() => {
         symbol: 'none',
         lineStyle: { width: 0 },
         areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(148, 163, 184, 0.6)' },
-            { offset: 1, color: 'rgba(148, 163, 184, 0.05)' },
-          ]),
+          color: 'rgba(123, 155, 143, 0.22)',
         },
         emphasis: {
           focus: 'series',
@@ -300,15 +288,15 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(13, 17, 23, 0.8);
+  background-color: rgba(255, 255, 255, 0.7);
   z-index: 10;
 }
 
 .spinner {
   width: 24px;
   height: 24px;
-  border: 2px solid var(--color-sg-bg-hover);
-  border-top-color: var(--color-sg-text-muted);
+  border: 2px solid rgba(15, 23, 42, 0.16);
+  border-top-color: var(--color-sg-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

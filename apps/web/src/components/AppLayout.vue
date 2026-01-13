@@ -117,7 +117,7 @@ onUnmounted(() => {
     <header class="app-header">
       <div class="header-left">
         <router-link to="/" class="logo">
-          <LayoutGrid class="logo-icon" />
+          <LayoutGrid class="logo-icon" :stroke-width="1" />
           <span class="logo-text">SignalGrid</span>
         </router-link>
 
@@ -249,20 +249,33 @@ onUnmounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--color-sg-bg);
+  background-color: transparent;
 }
 
 .app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 56px;
+  height: 64px;
   padding: 0 var(--space-4);
-  background-color: var(--color-sg-bg);
+  background-color: var(--color-sg-bg-elevated);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--color-sg-border);
   box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 50;
+}
+
+.app-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--color-sg-accent);
+  opacity: 0.7;
 }
 
 @media (min-width: 768px) {
@@ -275,6 +288,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  flex: 0 0 auto;
 }
 
 @media (min-width: 768px) {
@@ -295,6 +309,7 @@ onUnmounted(() => {
   width: 24px;
   height: 24px;
   color: var(--color-sg-text);
+  stroke-width: 1;
 }
 
 .logo-text {
@@ -313,9 +328,11 @@ onUnmounted(() => {
   display: none;
   align-items: center;
   background-color: var(--color-sg-bg-elevated);
-  border-radius: 8px;
-  padding: var(--space-2) var(--space-3);
+  border-radius: 999px;
+  padding: 6px 12px;
   width: 240px;
+  border: 1px solid var(--color-sg-border);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
 }
 
 @media (min-width: 768px) {
@@ -327,7 +344,7 @@ onUnmounted(() => {
 .search-icon {
   width: 16px;
   height: 16px;
-  color: var(--color-sg-text-muted);
+  color: var(--color-sg-text-subtle);
   flex-shrink: 0;
 }
 
@@ -349,7 +366,9 @@ onUnmounted(() => {
 .header-nav {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-3);
+  flex: 1;
+  justify-content: center;
 }
 
 @media (min-width: 768px) {
@@ -359,16 +378,16 @@ onUnmounted(() => {
 }
 
 .nav-link {
-  padding: var(--space-2) var(--space-3);
+  padding: 6px 8px;
   font-size: var(--text-body);
   font-weight: var(--weight-medium);
   line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
   text-decoration: none;
-  border-radius: 6px;
+  border-bottom: 2px solid transparent;
   transition:
     color 0.15s,
-    background-color 0.15s;
+    border-color 0.15s;
 }
 
 @media (max-width: 640px) {
@@ -379,23 +398,12 @@ onUnmounted(() => {
 
 .nav-link:hover {
   color: var(--color-sg-text);
-  background-color: var(--color-sg-bg-hover);
 }
 
 .nav-link.active {
-  color: var(--color-sg-text);
-  position: relative;
-}
-
-.nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: var(--space-3);
-  right: var(--space-3);
-  height: 2px;
-  background-color: var(--color-sg-text);
-  border-radius: 1px;
+  color: var(--color-sg-accent);
+  border-color: var(--color-sg-accent);
+  font-weight: var(--weight-semibold);
 }
 
 .header-right {
@@ -418,12 +426,12 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: none;
-  border: none;
-  border-radius: 6px;
-  color: var(--color-sg-text-muted);
+  width: 34px;
+  height: 34px;
+  background-color: var(--color-sg-bg-elevated);
+  border: 1px solid var(--color-sg-border);
+  border-radius: 999px;
+  color: var(--color-sg-text-secondary);
   cursor: pointer;
   transition:
     color 0.15s,
@@ -448,8 +456,8 @@ onUnmounted(() => {
 
 .notification-badge {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: -6px;
+  right: -6px;
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
@@ -457,6 +465,7 @@ onUnmounted(() => {
   font-weight: var(--weight-semibold);
   color: white;
   background-color: var(--color-sg-error);
+  border: 2px solid var(--color-sg-bg-elevated);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -467,8 +476,8 @@ onUnmounted(() => {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3f3f46, #52525b);
-  border: none;
+  background-color: var(--color-sg-accent-subtle);
+  border: 1px solid var(--color-sg-accent-muted);
   color: var(--color-sg-text);
   font-size: var(--text-body);
   font-weight: var(--weight-semibold);
@@ -480,8 +489,8 @@ onUnmounted(() => {
 
 .avatar-btn:hover,
 .avatar-btn.active {
-  transform: scale(1.05);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+  transform: scale(1.04);
+  box-shadow: 0 0 0 3px rgba(0, 203, 179, 0.18);
 }
 
 /* Dropdowns */
@@ -489,9 +498,11 @@ onUnmounted(() => {
   position: absolute;
   top: calc(100% + var(--space-2));
   right: 0;
-  background-color: var(--color-sg-bg-card);
+  background-color: var(--color-sg-bg-elevated);
+  border: 1px solid var(--color-sg-border);
   border-radius: 16px;
   box-shadow: var(--shadow-xl);
+  backdrop-filter: blur(18px);
   z-index: 100;
   overflow: hidden;
 }
@@ -532,8 +543,6 @@ onUnmounted(() => {
   border: none;
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
   color: var(--color-sg-text-muted);
   cursor: pointer;
   transition: color 0.15s;
@@ -585,7 +594,7 @@ onUnmounted(() => {
 }
 
 .notification-item.unread {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: var(--color-sg-accent-subtle);
 }
 
 .notification-item.unread::before {
@@ -597,7 +606,7 @@ onUnmounted(() => {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background-color: var(--color-sg-text-muted);
+  background-color: var(--color-sg-accent);
 }
 
 .notification-content {
@@ -626,8 +635,6 @@ onUnmounted(() => {
 .notification-time {
   font-size: var(--text-micro);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
   color: var(--color-sg-text-subtle);
 }
 
@@ -651,7 +658,7 @@ onUnmounted(() => {
 }
 
 .notification-close:hover {
-  background-color: var(--color-sg-bg-card);
+  background-color: var(--color-sg-bg-hover);
   color: var(--color-sg-text);
 }
 
@@ -676,7 +683,7 @@ onUnmounted(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3f3f46, #52525b);
+  background-color: var(--color-sg-accent-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -710,7 +717,7 @@ onUnmounted(() => {
 
 .dropdown-divider {
   height: 1px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--color-sg-border);
   margin: var(--space-2) 0;
 }
 
@@ -741,7 +748,7 @@ onUnmounted(() => {
 }
 
 .dropdown-item.logout:hover {
-  background-color: var(--color-sg-error-subtle);
+  background-color: var(--color-sg-error-muted);
   color: var(--color-sg-error);
 }
 

@@ -134,16 +134,18 @@ const handleBackdropClick = (event: MouseEvent) => {
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  background-color: rgba(15, 23, 42, 0.25);
+  backdrop-filter: blur(8px);
   z-index: 100;
 }
 
 .modal-container {
   width: 100%;
   max-width: 480px;
-  background-color: var(--color-sg-bg-card);
-  border-radius: 16px;
+  background-color: white;
+  border-radius: 20px;
+  border: 1px solid var(--color-sg-border);
+  backdrop-filter: blur(18px);
   box-shadow: var(--shadow-xl);
   overflow: hidden;
 }
@@ -178,8 +180,8 @@ const handleBackdropClick = (event: MouseEvent) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(251, 113, 133, 0.12);
-  border-radius: 10px;
+  background-color: var(--color-sg-error-subtle);
+  border-radius: 14px;
   color: var(--color-sg-error);
   flex-shrink: 0;
 }
@@ -215,14 +217,14 @@ const handleBackdropClick = (event: MouseEvent) => {
   height: var(--space-8);
   background: none;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   color: var(--color-sg-text-muted);
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .close-btn:hover {
-  background-color: var(--color-sg-bg-hover);
+  background-color: rgba(255, 255, 255, 0.8);
   color: var(--color-sg-text);
 }
 
@@ -249,9 +251,7 @@ const handleBackdropClick = (event: MouseEvent) => {
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-sg-text);
+  color: var(--color-sg-text-secondary);
   margin-bottom: var(--space-2);
 }
 
@@ -265,10 +265,10 @@ const handleBackdropClick = (event: MouseEvent) => {
 .form-input,
 .form-textarea {
   width: 100%;
-  padding: var(--space-3);
-  background-color: var(--color-sg-bg-elevated);
-  border: none;
-  border-radius: 8px;
+  padding: 10px 14px;
+  background-color: white;
+  border: 1px solid var(--color-sg-border);
+  border-radius: 14px;
   font-size: var(--text-body);
   line-height: var(--leading-body);
   color: var(--color-sg-text);
@@ -284,7 +284,6 @@ const handleBackdropClick = (event: MouseEvent) => {
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .form-input:disabled,
@@ -311,8 +310,8 @@ const handleBackdropClick = (event: MouseEvent) => {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  border-radius: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
   font-size: var(--text-body);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-body);
@@ -326,20 +325,20 @@ const handleBackdropClick = (event: MouseEvent) => {
 }
 
 .btn-secondary {
-  background-color: var(--color-sg-bg-hover);
-  border: none;
-  color: var(--color-sg-text-muted);
+  background-color: var(--color-sg-bg-elevated);
+  border: 1px solid var(--color-sg-border);
+  color: var(--color-sg-text-secondary);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--color-sg-bg-active);
+  background-color: var(--color-sg-bg-hover);
   color: var(--color-sg-text);
 }
 
 .btn-primary {
   background-color: var(--color-sg-accent);
   border: none;
-  color: var(--color-sg-bg);
+  color: white;
 }
 
 .btn-primary:hover:not(:disabled) {

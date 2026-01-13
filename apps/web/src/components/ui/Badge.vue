@@ -13,15 +13,16 @@ const props = withDefaults(
 );
 
 const classes = computed(() => {
-  const base = 'inline-flex items-center px-2.5 py-0.5 text-[11px] font-normal rounded-full';
+  const base =
+    'inline-flex items-center px-2.5 py-1 text-[11px] font-medium rounded-full border border-transparent';
 
   const variants = {
-    error: 'bg-red-500/8 text-red-400',
-    warn: 'bg-amber-500/8 text-amber-400',
-    info: 'bg-blue-500/8 text-blue-400',
-    debug: 'bg-zinc-500/8 text-zinc-400',
-    success: 'bg-emerald-500/8 text-emerald-400',
-    neutral: 'bg-zinc-500/8 text-zinc-400',
+    error: 'bg-[--color-sg-error-subtle] text-[--color-sg-error]',
+    warn: 'bg-[--color-sg-warn-subtle] text-[--color-sg-warn]',
+    info: 'bg-[--color-sg-info-subtle] text-[--color-sg-info]',
+    debug: 'bg-[--color-sg-debug-muted] text-[--color-sg-text-muted]',
+    success: 'bg-[--color-sg-success-subtle] text-[--color-sg-success]',
+    neutral: 'bg-white text-[--color-sg-text-secondary] border-[--color-sg-border]',
   };
 
   return [base, variants[props.variant]];

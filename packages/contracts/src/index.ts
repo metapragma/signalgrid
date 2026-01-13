@@ -155,6 +155,7 @@ export const IncidentSummarySchema = z.object({
   status: IncidentStatusSchema,
   title: z.string(),
   createdAt: IsoDateSchema,
+  updatedAt: IsoDateSchema,
   commentCount: z.number().int(),
   eventCount: z.number().int(),
 });
@@ -167,6 +168,7 @@ export const IncidentDetailSchema = z.object({
   title: z.string(),
   description: z.string().nullable(),
   createdAt: IsoDateSchema,
+  updatedAt: IsoDateSchema,
   comments: z.array(CommentSchema),
   events: z.array(EventSchema),
 });

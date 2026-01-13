@@ -63,7 +63,7 @@ const payloadPreview = computed(() => {
 }
 
 .event-row:hover {
-  background-color: var(--color-sg-bg-hover);
+  background-color: rgba(255, 255, 255, 0.85);
 }
 
 .event-time {
@@ -76,9 +76,8 @@ const payloadPreview = computed(() => {
   font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-micro);
-  letter-spacing: var(--tracking-wide);
   padding: 2px var(--space-2);
-  border-radius: 3px;
+  border-radius: 999px;
   text-align: center;
   flex-shrink: 0;
 }
@@ -111,7 +110,7 @@ const payloadPreview = computed(() => {
 /* Severity colors */
 .severity-debug .event-severity {
   background-color: var(--color-sg-debug-muted);
-  color: var(--color-sg-text-subtle);
+  color: var(--color-sg-text-muted);
 }
 
 .severity-info .event-severity {

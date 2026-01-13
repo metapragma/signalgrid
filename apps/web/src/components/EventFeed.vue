@@ -117,7 +117,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #121212;
+  background-color: transparent;
 }
 
 .feed-header {
@@ -125,13 +125,13 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 8px 16px;
-  background-color: #1a1a1a;
-  border-bottom: 1px solid #2a2a2a;
+  background-color: var(--color-sg-bg-elevated);
+  border-bottom: 1px solid var(--color-sg-border);
 }
 
 .event-count {
   font-size: 12px;
-  color: #666;
+  color: var(--color-sg-text-muted);
 }
 
 .new-events-btn {
@@ -140,20 +140,21 @@ onMounted(() => {
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
-  background-color: #5eaeff;
-  color: #000;
+  background-color: var(--color-sg-accent);
+  color: white;
   border: none;
-  border-radius: 20px;
+  border-radius: 999px;
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: background-color 0.15s ease;
+  box-shadow: 0 8px 20px rgba(0, 203, 179, 0.28);
+  transition: all 0.15s ease;
 }
 
 .new-events-btn:hover {
-  background-color: #7ec8ff;
+  transform: translateX(-50%) translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 203, 179, 0.35);
 }
 
 .feed-container {
@@ -166,7 +167,7 @@ onMounted(() => {
 .end-indicator {
   padding: 16px;
   text-align: center;
-  color: #666;
+  color: var(--color-sg-text-muted);
   font-size: 13px;
 }
 
@@ -176,7 +177,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   height: 300px;
-  color: #666;
+  color: var(--color-sg-text-muted);
 }
 
 .empty-state p {
@@ -185,6 +186,6 @@ onMounted(() => {
 
 .empty-hint {
   font-size: 13px;
-  color: #444;
+  color: var(--color-sg-text-subtle);
 }
 </style>

@@ -8,9 +8,9 @@ const auth = useAuthStore();
 
 <template>
   <main class="home">
-    <div class="hero">
+    <div class="hero enter-rise">
       <div class="logo">
-        <LayoutGrid class="logo-icon" />
+        <LayoutGrid class="logo-icon" :stroke-width="0.5" />
         <span class="logo-text">SignalGrid</span>
       </div>
 
@@ -18,6 +18,41 @@ const auth = useAuthStore();
       <p class="subtitle">
         Monitor events, track incidents, and respond faster with a unified operations platform.
       </p>
+
+      <div class="hero-visual enter-rise delay-1" aria-hidden="true">
+        <div class="window">
+          <div class="window-bar">
+            <div class="window-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <span class="window-title">Operations Overview</span>
+          </div>
+          <div class="window-body">
+            <div class="metric-grid">
+              <div class="metric">
+                <span>Latency</span>
+                <strong>184ms</strong>
+              </div>
+              <div class="metric">
+                <span>Error rate</span>
+                <strong>0.6%</strong>
+              </div>
+              <div class="metric">
+                <span>Incidents</span>
+                <strong>2 open</strong>
+              </div>
+            </div>
+            <div class="chart-spark">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div v-if="auth.isAuthenticated" class="nav-cards">
         <RouterLink to="/feed" class="nav-card">
@@ -66,12 +101,12 @@ const auth = useAuthStore();
   justify-content: center;
   min-height: 100vh;
   padding: var(--space-6);
-  background-color: var(--color-sg-bg);
+  background-color: transparent;
 }
 
 .hero {
   text-align: center;
-  max-width: 600px;
+  max-width: 720px;
 }
 
 .logo {
@@ -84,7 +119,7 @@ const auth = useAuthStore();
 .logo-icon {
   width: 40px;
   height: 40px;
-  color: var(--color-sg-text-muted);
+  color: var(--color-sg-text-secondary);
 }
 
 .logo-text {
@@ -96,7 +131,7 @@ const auth = useAuthStore();
 }
 
 .title {
-  font-size: 36px;
+  font-size: 40px;
   font-weight: var(--weight-semibold);
   line-height: var(--leading-display);
   color: var(--color-sg-text);
@@ -114,7 +149,7 @@ const auth = useAuthStore();
   font-size: var(--text-body);
   line-height: var(--leading-body);
   color: var(--color-sg-text-muted);
-  margin-bottom: var(--space-10);
+  margin-bottom: var(--space-8);
 }
 
 @media (min-width: 640px) {
@@ -146,33 +181,35 @@ const auth = useAuthStore();
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
+  padding: 10px 22px;
   font-size: var(--text-body);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-body);
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 999px;
   transition: all 0.15s ease;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary {
-  background-color: var(--color-sg-accent);
-  color: var(--color-sg-bg);
+  background-color: var(--color-sg-success);
+  color: white;
 }
 
 .btn-primary:hover {
-  background-color: var(--color-sg-accent-hover);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-secondary {
-  background-color: var(--color-sg-bg-hover);
+  background-color: var(--color-sg-bg-elevated);
   color: var(--color-sg-text);
-  border: none;
+  border: 1px solid var(--color-sg-border);
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-sg-bg-active);
+  background-color: var(--color-sg-bg-hover);
 }
 
 .btn-icon {
@@ -193,7 +230,9 @@ const auth = useAuthStore();
   gap: var(--space-4);
   padding: var(--space-4);
   background-color: var(--color-sg-bg-card);
-  border-radius: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--color-sg-border);
+  backdrop-filter: blur(8px);
   text-decoration: none;
   transition: all 0.15s ease;
 }
@@ -237,6 +276,110 @@ const auth = useAuthStore();
   transition:
     transform 0.15s,
     color 0.15s;
+}
+
+.hero-visual {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-10);
+}
+
+.window {
+  width: min(520px, 100%);
+  background: var(--color-sg-bg-card);
+  border: 1px solid var(--color-sg-border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+}
+
+.window-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background-color: var(--color-sg-bg-elevated);
+  border-bottom: 1px solid var(--color-sg-border);
+}
+
+.window-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.window-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-sg-border-light);
+}
+
+.window-title {
+  font-size: var(--text-micro);
+  color: var(--color-sg-text-muted);
+}
+
+.window-body {
+  padding: 18px;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background-color: var(--color-sg-bg-elevated);
+  border-radius: 14px;
+  border: 1px solid var(--color-sg-border);
+}
+
+.metric span {
+  font-size: var(--text-micro);
+  color: var(--color-sg-text-muted);
+}
+
+.metric strong {
+  font-size: var(--text-title);
+  color: var(--color-sg-text);
+}
+
+.chart-spark {
+  height: 80px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.chart-spark span {
+  display: block;
+  width: 100%;
+  border-radius: 999px;
+  background-color: var(--color-sg-success);
+}
+
+.chart-spark span:nth-child(1) {
+  height: 60%;
+}
+
+.chart-spark span:nth-child(2) {
+  height: 80%;
+}
+
+.chart-spark span:nth-child(3) {
+  height: 45%;
+}
+
+.chart-spark span:nth-child(4) {
+  height: 70%;
 }
 
 .nav-card:hover .arrow-icon {

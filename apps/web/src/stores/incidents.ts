@@ -7,6 +7,7 @@ export interface IncidentSummary {
   status: 'OPEN' | 'CLOSED';
   title: string;
   createdAt: string;
+  updatedAt: string;
   commentCount: number;
   eventCount: number;
 }
@@ -27,6 +28,7 @@ export interface IncidentDetail {
   title: string;
   description: string | null;
   createdAt: string;
+  updatedAt: string;
   comments: Comment[];
   events: Array<{
     id: string;
@@ -60,8 +62,10 @@ export const useIncidentsStore = defineStore('incidents', () => {
     }
   };
 
-  const fetchIncident = async (id: string) => {
-    isLoading.value = true;
+  const fetchIncident = async (id: string, options: { silent?: boolean } = {}) => {
+    if (!options.silent) {
+      isLoading.value = true;
+    }
     error.value = null;
     try {
       const response = await authStore.client.incidents.get(id);
@@ -70,7 +74,9 @@ export const useIncidentsStore = defineStore('incidents', () => {
       error.value = authStore.handleApiError(e);
       currentIncident.value = null;
     } finally {
-      isLoading.value = false;
+      if (!options.silent) {
+        isLoading.value = false;
+      }
     }
   };
 
@@ -128,7 +134,7 @@ export const useIncidentsStore = defineStore('incidents', () => {
     error.value = null;
     try {
       await authStore.client.incidents.addComment(incidentId, { body });
-      await fetchIncident(incidentId);
+      await fetchIncident(incidentId, { silent: true });
     } catch (e) {
       error.value = authStore.handleApiError(e);
       throw e;

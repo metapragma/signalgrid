@@ -17,11 +17,12 @@ const props = withDefaults(
 );
 
 const classes = computed(() => {
-  const base = 'rounded-2xl transition-all';
+  const base =
+    'rounded-2xl border border-[--color-sg-border] bg-[--color-sg-bg-card] transition-all shadow-[--shadow-sm]';
 
   const variants = {
-    default: 'bg-[--color-sg-bg-card]',
-    elevated: 'bg-[--color-sg-bg-card] shadow-[--shadow-md]',
+    default: '',
+    elevated: 'shadow-[--shadow-md]',
   };
 
   const paddings = {
@@ -31,7 +32,9 @@ const classes = computed(() => {
     lg: 'p-8',
   };
 
-  const hoverClass = props.hover ? 'hover:bg-[--color-sg-bg-hover] hover:shadow-[--shadow-md] cursor-pointer' : '';
+  const hoverClass = props.hover
+    ? 'hover:bg-[--color-sg-bg-hover] hover:shadow-[--shadow-md] cursor-pointer'
+    : '';
 
   return [base, variants[props.variant], paddings[props.padding], hoverClass];
 });
