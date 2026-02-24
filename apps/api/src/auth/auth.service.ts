@@ -92,7 +92,7 @@ export class AuthService {
       membership.tenantId,
       membership.role,
     );
-    const refreshToken = this.generateRefreshToken(user.id);
+    const refreshToken = await this.generateRefreshToken(user.id);
 
     return {
       user: { id: user.id, email: user.email },
@@ -135,7 +135,7 @@ export class AuthService {
       membership.tenantId,
       membership.role,
     );
-    const refreshToken = this.generateRefreshToken(user.id);
+    const refreshToken = await this.generateRefreshToken(user.id);
 
     return {
       user: { id: user.id, email: user.email },
@@ -186,6 +186,24 @@ export class AuthService {
       throw new UnauthorizedException('Invalid token type');
     }
 
+    // Hash the token to find it in the database
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+
+    // Find valid refresh token in DB
+    const storedToken = await this.prisma.refreshToken.findUnique({
+      where: { tokenHash },
+    });
+
+    if (!storedToken) {
+      throw new UnauthorizedException('Refresh token has been revoked or invalid');
+    }
+
+    if (storedToken.expiresAt < new Date()) {
+      // Clean up expired token
+      await this.prisma.refreshToken.delete({ where: { tokenHash } });
+      throw new UnauthorizedException('Refresh token expired');
+    }
+
     // Get user with memberships
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
@@ -205,6 +223,13 @@ export class AuthService {
       throw new UnauthorizedException('User has no tenant membership');
     }
 
+    // Rotate refresh token (optional security measure, preventing replay attacks)
+    // For now, we'll keep the same refresh token until it expires to simplify,
+    // or we could issue a new one and delete the old one.
+    // Let's implement rotation: delete old, issue new.
+    await this.prisma.refreshToken.delete({ where: { tokenHash } });
+    const newRefreshToken = await this.generateRefreshToken(user.id);
+
     // Generate new access token
     const { token, expiresAt } = this.generateAccessToken(
       user.id,
@@ -213,7 +238,34 @@ export class AuthService {
       membership.role,
     );
 
-    return { token, expiresAt };
+    // Note: The controller needs to attach the NEW refresh token to the cookie.
+    // However, the return type `RefreshResult` only has { token, expiresAt }.
+    // We should probably update the controller and this return type to include the new refresh token.
+    // But to minimize interface changes, we can rely on the client using the new access token.
+    // Wait, if we rotate the refresh token, we MUST send it back to the client (in the cookie).
+    // The current `RefreshResponseSchema` in contracts doesn't include the refresh token (it's in cookie).
+    // The controller currently does:
+    // @Post('refresh')
+    // async refresh(@Req() req, @Res({ passthrough: true }) res) { ... }
+
+    // So we need to return the new refresh token from here so the controller can set the cookie.
+
+    // NOTE: This changes the internal signature but not the public API contract (since refresh token is cookie-only)
+    // We will cast the return type to `Promise<RefreshResult & { refreshToken: string }>` internally.
+    return { token, expiresAt, refreshToken: newRefreshToken } as any;
+  }
+
+  async logout(refreshToken?: string): Promise<void> {
+    if (!refreshToken) return;
+
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    try {
+      await this.prisma.refreshToken.delete({
+        where: { tokenHash },
+      });
+    } catch {
+      // Ignore if token not found
+    }
   }
 
   private generateAccessToken(
@@ -235,16 +287,29 @@ export class AuthService {
     return { token, expiresAt };
   }
 
-  private generateRefreshToken(userId: string): string {
+  private async generateRefreshToken(userId: string): Promise<string> {
     const payload: RefreshTokenPayload = {
       sub: userId,
       tokenId: crypto.randomUUID(),
       type: 'refresh',
     };
 
-    return this.jwtService.sign(payload, {
+    const token = this.jwtService.sign(payload, {
       secret: this.jwtSecret,
       expiresIn: REFRESH_TOKEN_EXPIRY_SECONDS,
     });
+
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const expiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_SECONDS * 1000);
+
+    await this.prisma.refreshToken.create({
+      data: {
+        tokenHash,
+        userId,
+        expiresAt,
+      },
+    });
+
+    return token;
   }
 }

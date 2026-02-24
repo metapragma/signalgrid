@@ -12,6 +12,9 @@ import { Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Severity } from '@prisma/client';
 import { IncomingMessage } from 'http';
+import { RedisClientType } from 'redis';
+import { REDIS_CLIENT, REDIS_SUBSCRIBER } from '../redis/redis.module';
+import { Inject } from '@nestjs/common';
 
 interface JwtPayload {
   sub: string;
@@ -52,12 +55,31 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // Backpressure: max events a client can fall behind before resync
   private readonly MAX_LAG_EVENTS = 1000;
+  private readonly CHANNEL_NAME = 'events:broadcast';
 
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
     private prisma: PrismaService,
+    @Inject(REDIS_CLIENT) private redisPublisher: RedisClientType,
+    @Inject(REDIS_SUBSCRIBER) private redisSubscriber: RedisClientType,
   ) {}
+
+  async onModuleInit() {
+    await this.subscribeToRedis();
+  }
+
+  private async subscribeToRedis() {
+    await this.redisSubscriber.subscribe(this.CHANNEL_NAME, (message) => {
+      try {
+        const event = JSON.parse(message);
+        // This time, we broadcast to LOCAL clients only
+        this.broadcastToLocalClients(event);
+      } catch (error) {
+        this.logger.error('Error parsing Redis message', error);
+      }
+    });
+  }
 
   async handleConnection(client: ExtendedWebSocket, request: IncomingMessage): Promise<void> {
     try {
@@ -190,7 +212,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   /**
-   * Broadcast a new event to all subscribed clients
+   * Broadcast a new event to all subscribed clients (via Redis Pub/Sub)
    */
   async broadcastEvent(event: {
     id: string;
@@ -202,7 +224,31 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     tenantId: string;
     seq: bigint;
   }): Promise<void> {
-    const cursor = event.seq.toString();
+    // Publish to Redis channel so ALL instances receive it
+    await this.redisPublisher.publish(
+      this.CHANNEL_NAME,
+      JSON.stringify({
+        ...event,
+        ts: event.ts.toISOString(),
+        seq: event.seq.toString(),
+      }),
+    );
+  }
+
+  /**
+   * Internal method to send event to locally connected clients
+   */
+  private broadcastToLocalClients(event: {
+    id: string;
+    ts: string;
+    type: string;
+    severity: Severity;
+    fingerprint: string;
+    payload: unknown;
+    tenantId: string;
+    seq: string;
+  }): void {
+    const cursor = event.seq;
 
     for (const [socket, clientData] of this.clients) {
       // Only send to clients in the same tenant
@@ -217,7 +263,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
             type: 'event',
             event: {
               id: event.id,
-              ts: event.ts.toISOString(),
+              ts: event.ts,
               type: event.type,
               severity: event.severity,
               fingerprint: event.fingerprint,

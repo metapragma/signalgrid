@@ -12,6 +12,7 @@ import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { RegisterDto as RegisterDtoLocal } from './dto/register.dto';
 
 // Cookie configuration for refresh token
 const REFRESH_TOKEN_COOKIE = 'refresh_token';
@@ -60,19 +61,36 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(@Req() req: Request) {
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE];
 
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not found');
     }
 
-    return this.authService.refresh(refreshToken);
+    // Since we now rotate tokens, we get a new refresh token back
+    const result = (await this.authService.refresh(refreshToken)) as any;
+
+    if (result.refreshToken) {
+      this.setRefreshTokenCookie(res, result.refreshToken);
+    }
+
+    // Don't expose refresh token in JSON
+    return {
+      token: result.token,
+      expiresAt: result.expiresAt,
+    };
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(@Res({ passthrough: true }) res: Response) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE];
+
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
+    }
+
     // Clear the refresh token cookie
     res.clearCookie(REFRESH_TOKEN_COOKIE, {
       httpOnly: true,
