@@ -9,10 +9,12 @@ import { MeModule } from './me/me.module';
 import { EventsModule } from './events/events.module';
 import { IncidentsModule } from './incidents/incidents.module';
 import { MetricsModule } from './metrics/metrics.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    RedisModule,
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
